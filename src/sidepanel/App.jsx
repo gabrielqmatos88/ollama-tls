@@ -16,8 +16,8 @@ async function loadConversation() {
 }
 
 async function saveConversation(conversation) {
-  conversation.updatedAt = Date.now()
-  await chrome.storage.local.set({ [CONVERSATIONS_KEY]: [conversation] })
+  const updated = { ...conversation, updatedAt: Date.now() }
+  await chrome.storage.local.set({ [CONVERSATIONS_KEY]: [updated] })
 }
 
 export default function App() {
@@ -26,6 +26,11 @@ export default function App() {
   const [streamingContent, setStreamingContent] = useState('')
   const abortRef = useRef(null)
   const messagesEndRef = useRef(null)
+  const conversationRef = useRef(conversation)
+
+  useEffect(() => {
+    conversationRef.current = conversation
+  }, [conversation])
 
   useEffect(() => {
     loadConversation().then(setConversation)
@@ -43,19 +48,20 @@ export default function App() {
     }
     chrome.runtime.onMessage.addListener(handleMessage)
     return () => chrome.runtime.onMessage.removeListener(handleMessage)
-  }, [conversation])
+  }, [])
 
   async function handlePromptReceived(promptId, selectedText, variables) {
-    const prompts = await getPrompts()
+    const prompts = (await getPrompts()) || []
     const prompt = prompts.find(p => p.id === promptId)
     if (!prompt) return
 
     const content = replaceVariables(prompt.template, selectedText, variables)
+    const current = conversationRef.current
 
-    const newMessage = { role: 'user', content }
+    const newMessage = { id: crypto.randomUUID(), role: 'user', content }
     const updated = {
-      ...conversation,
-      messages: [...(conversation?.messages || []), newMessage],
+      ...current,
+      messages: [...(current?.messages || []), newMessage],
     }
     setConversation(updated)
     await saveConversation(updated)
@@ -66,8 +72,9 @@ export default function App() {
   async function sendToAI(messages) {
     const provider = await getDefaultProvider()
     if (!provider) {
-      const errorMsg = { role: 'assistant', content: 'Error: No provider configured. Please add a provider in the options page.' }
-      const updated = { ...conversation, messages: [...messages, errorMsg] }
+      const current = conversationRef.current
+      const errorMsg = { id: crypto.randomUUID(), role: 'assistant', content: 'Error: No provider configured. Please add a provider in the options page.' }
+      const updated = { ...current, messages: [...messages, errorMsg] }
       setConversation(updated)
       await saveConversation(updated)
       return
@@ -98,8 +105,9 @@ export default function App() {
       setIsStreaming(false)
       const finalContent = streamingContent || ''
       if (finalContent) {
-        const assistantMsg = { role: 'assistant', content: finalContent }
-        const updated = { ...conversation, messages: [...messages, assistantMsg] }
+        const current = conversationRef.current
+        const assistantMsg = { id: crypto.randomUUID(), role: 'assistant', content: finalContent }
+        const updated = { ...current, messages: [...messages, assistantMsg] }
         setConversation(updated)
         await saveConversation(updated)
       }
@@ -109,10 +117,11 @@ export default function App() {
   }
 
   async function handleSend(text) {
-    const newMessage = { role: 'user', content: text }
+    const current = conversationRef.current
+    const newMessage = { id: crypto.randomUUID(), role: 'user', content: text }
     const updated = {
-      ...conversation,
-      messages: [...(conversation?.messages || []), newMessage],
+      ...current,
+      messages: [...(current?.messages || []), newMessage],
     }
     setConversation(updated)
     await saveConversation(updated)
@@ -149,7 +158,7 @@ export default function App() {
           <div className="empty-state">Select text on a page and choose a prompt to get started.</div>
         )}
         {messages.map((msg, i) => (
-          <ChatMessage key={i} message={msg} onCopy={handleCopy} />
+          <ChatMessage key={msg.id || i} message={msg} onCopy={handleCopy} />
         ))}
         {isStreaming && streamingContent && (
           <div className="chat-message assistant">
