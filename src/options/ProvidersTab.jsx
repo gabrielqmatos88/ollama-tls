@@ -1,0 +1,184 @@
+import { useState, useEffect } from 'react'
+import { getProviders, addProvider, updateProvider, deleteProvider } from '@/storage/providers'
+
+const EMPTY_PROVIDER = {
+  name: '',
+  baseUrl: '',
+  apiKey: '',
+  model: '',
+  isDefault: false,
+}
+
+export default function ProvidersTab() {
+  const [providers, setProviders] = useState([])
+  const [editing, setEditing] = useState(null) // null | 'new' | provider id
+  const [form, setForm] = useState(EMPTY_PROVIDER)
+  const [testResult, setTestResult] = useState(null)
+
+  useEffect(() => {
+    loadProviders()
+  }, [])
+
+  async function loadProviders() {
+    const loaded = await getProviders()
+    setProviders(loaded)
+  }
+
+  function startAdd() {
+    setForm({ ...EMPTY_PROVIDER })
+    setEditing('new')
+    setTestResult(null)
+  }
+
+  function startEdit(provider) {
+    setForm({ ...provider })
+    setEditing(provider.id)
+    setTestResult(null)
+  }
+
+  function cancelEdit() {
+    setEditing(null)
+    setForm(EMPTY_PROVIDER)
+    setTestResult(null)
+  }
+
+  async function handleSave() {
+    if (!form.name || !form.baseUrl || !form.model) return
+
+    if (editing === 'new') {
+      await addProvider(form)
+    } else {
+      await updateProvider(editing, form)
+    }
+
+    await loadProviders()
+    cancelEdit()
+  }
+
+  async function handleDelete(id) {
+    await deleteProvider(id)
+    await loadProviders()
+    if (editing === id) cancelEdit()
+  }
+
+  async function handleSetDefault(id) {
+    // Clear all defaults first
+    for (const p of providers) {
+      if (p.isDefault) await updateProvider(p.id, { isDefault: false })
+    }
+    await updateProvider(id, { isDefault: true })
+    await loadProviders()
+  }
+
+  async function handleTestConnection() {
+    setTestResult('testing...')
+    try {
+      const { callProvider } = await import('@/api/client.js')
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 10000)
+
+      await callProvider({
+        baseUrl: form.baseUrl,
+        apiKey: form.apiKey,
+        model: form.model,
+        messages: [{ role: 'user', content: 'Say "connection ok" in 3 words or less.' }],
+        signal: controller.signal,
+        onChunk: () => {},
+      })
+
+      clearTimeout(timeout)
+      setTestResult('Connection successful!')
+    } catch (err) {
+      setTestResult(`Error: ${err.message}`)
+    }
+  }
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2>Providers</h2>
+        <button className="btn btn-primary" onClick={startAdd}>Add Provider</button>
+      </div>
+
+      {editing && (
+        <div style={{ background: '#f9fafb', padding: 16, borderRadius: 8, marginBottom: 16, border: '1px solid #e5e7eb' }}>
+          <h3 style={{ marginBottom: 12 }}>{editing === 'new' ? 'New Provider' : 'Edit Provider'}</h3>
+          <div style={{ display: 'grid', gap: 12 }}>
+            <label>
+              Name
+              <input
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                placeholder="My Provider"
+              />
+            </label>
+            <label>
+              Base URL
+              <input
+                value={form.baseUrl}
+                onChange={e => setForm({ ...form, baseUrl: e.target.value })}
+                placeholder="http://localhost:11434/v1"
+              />
+            </label>
+            <label>
+              API Key (optional for local)
+              <input
+                type="password"
+                value={form.apiKey}
+                onChange={e => setForm({ ...form, apiKey: e.target.value })}
+                placeholder="sk-..."
+              />
+            </label>
+            <label>
+              Model
+              <input
+                value={form.model}
+                onChange={e => setForm({ ...form, model: e.target.value })}
+                placeholder="llama3.2"
+              />
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input
+                type="checkbox"
+                checked={form.isDefault}
+                onChange={e => setForm({ ...form, isDefault: e.target.checked })}
+                style={{ width: 'auto' }}
+              />
+              Set as default provider
+            </label>
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+            <button className="btn btn-primary" onClick={handleSave}>Save</button>
+            <button className="btn btn-secondary" onClick={handleTestConnection}>Test Connection</button>
+            <button className="btn btn-secondary" onClick={cancelEdit}>Cancel</button>
+            {testResult && <span style={{ alignSelf: 'center', fontSize: 14, color: testResult.includes('Error') ? '#dc2626' : '#16a34a' }}>{testResult}</span>}
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gap: 8 }}>
+        {providers.map(provider => (
+          <div key={provider.id} style={{ display: 'flex', alignItems: 'center', padding: 12, border: '1px solid #e5e7eb', borderRadius: 8, gap: 12 }}>
+            <input
+              type="radio"
+              name="defaultProvider"
+              checked={provider.isDefault}
+              onChange={() => handleSetDefault(provider.id)}
+              style={{ width: 'auto' }}
+            />
+            <div style={{ flex: 1 }}>
+              <strong>{provider.name}</strong>
+              {provider.isDefault && <span style={{ marginLeft: 8, fontSize: 12, color: '#2563eb', background: '#eff6ff', padding: '2px 6px', borderRadius: 4 }}>default</span>}
+              <div style={{ fontSize: 13, color: '#666' }}>{provider.baseUrl} — {provider.model}</div>
+            </div>
+            <button className="btn btn-secondary" onClick={() => startEdit(provider)}>Edit</button>
+            <button className="btn btn-danger" onClick={() => handleDelete(provider.id)}>Delete</button>
+          </div>
+        ))}
+        {providers.length === 0 && !editing && (
+          <p style={{ color: '#666', textAlign: 'center', padding: 24 }}>No providers configured. Click "Add Provider" to get started.</p>
+        )}
+      </div>
+    </div>
+  )
+}
