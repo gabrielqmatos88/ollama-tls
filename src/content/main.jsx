@@ -46,14 +46,13 @@ function hidePopup() {
 }
 
 async function handleSend(promptId, selectedText, variables) {
-  // Get the current tab ID
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
-  
-  await sendMessage('PROMPT_FROM_CONTENT', {
+  // Send message to background to open side panel and forward
+  chrome.runtime.sendMessage({
+    type: 'OPEN_SIDEBAR_WITH_PROMPT',
     promptId,
     selectedText,
     variables,
-  }, { openSidePanel: true, tabId: tab.id })
+  })
 
   hidePopup()
 }

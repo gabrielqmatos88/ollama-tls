@@ -24,7 +24,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
  * Send a message through the bus
  * @param {string} type - Message type
  * @param {object} data - Message data
- * @param {object} options - { openSidePanel: boolean, tabId: number }
+ * @param {object} options - { openSidePanel: boolean, windowId: number }
  */
 export async function sendMessage(type, data = {}, options = {}) {
   const message = { type, data, timestamp: Date.now() }
@@ -33,10 +33,13 @@ export async function sendMessage(type, data = {}, options = {}) {
   await chrome.storage.local.set({ [PENDING_KEY]: [message] })
 
   // Open side panel if requested
-  if (options.openSidePanel && options.tabId) {
+  if (options.openSidePanel && options.windowId) {
     try {
-      await chrome.sidePanel.open({ tabId: options.tabId })
-      await chrome.sidePanel.setOptions({ tabId: options.tabId, enabled: true })
+      await chrome.sidePanel.open({ windowId: options.windowId })
+      await chrome.sidePanel.setOptions({ 
+        tabId: options.windowId, 
+        enabled: true 
+      })
     } catch (err) {
       console.error('MessageBus: Failed to open side panel:', err)
     }

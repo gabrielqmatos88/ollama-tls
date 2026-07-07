@@ -1,7 +1,7 @@
 import { getPrompts, initializePrompts } from '@/storage/prompts'
 import { getSettings } from '@/storage/settings'
 import { parseVariables } from '@/utils/templateParser'
-import { sendMessage } from '@/utils/messageBus'
+import { sidePanelManager } from './sidePanelManager.js'
 
 chrome.runtime.onInstalled.addListener(async () => {
   await initializePrompts()
@@ -54,19 +54,12 @@ async function getVariablesForPrompt(promptId) {
   return variables
 }
 
-// Listen for messages from content script
-chrome.storage.onChanged.addListener(async (changes, area) => {
-  if (area === 'local' && changes.messageBus_pending?.newValue) {
-    const messages = changes.messageBus_pending.newValue
-    for (const msg of messages) {
-      if (msg.type === 'PROMPT_FROM_CONTENT') {
-        const { promptId, selectedText, variables } = msg.data
-        // Re-broadcast as PROMPT_SELECTED for the side panel
-        await sendMessage('PROMPT_SELECTED', { promptId, selectedText, variables })
-      }
-    }
-  }
-})
+async function sendToSidePanel(data) {
+  // Store the message
+  await chrome.storage.local.set({
+    messageBus_pending: [{ type: 'PROMPT_SELECTED', data, timestamp: Date.now() }]
+  })
+}
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (!info.menuItemId.startsWith('prompt:')) return
@@ -75,21 +68,32 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   const selectedText = info.selectionText
   const variables = await getVariablesForPrompt(promptId)
 
-  await sendMessage('PROMPT_SELECTED', { promptId, selectedText, variables }, {
-    openSidePanel: true,
-    tabId: tab.id,
-  })
+  // Get or open side panel
+  const windowId = tab.windowId
+  await sidePanelManager.getOrOpen(windowId)
+
+  // Send the message
+  await sendToSidePanel({ promptId, selectedText, variables })
 })
 
-// Handle messages from popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'OPEN_SIDEBAR_WITH_PROMPT') {
     const { promptId, selectedText, variables } = message
-    sendMessage('PROMPT_SELECTED', { promptId, selectedText, variables }, {
-      openSidePanel: true,
-      tabId: sender.tab.id,
-    })
+    const windowId = sender.tab?.windowId
+
+    if (windowId) {
+      sidePanelManager.getOrOpen(windowId).then(() => {
+        sendToSidePanel({ promptId, selectedText, variables })
+      })
+    }
+
     sendResponse({ ok: true })
   }
   return true
+})
+
+// Sync side panel state on window focus changes
+chrome.windows.onFocusChanged.addListener(async (windowId) => {
+  if (windowId === chrome.windows.WINDOW_ID_NONE) return
+  await sidePanelManager.isOpen()
 })
