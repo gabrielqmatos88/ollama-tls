@@ -1,4 +1,6 @@
 import { getPrompts, initializePrompts } from '@/storage/prompts'
+import { getSettings } from '@/storage/settings'
+import { parseVariables } from '@/utils/templateParser'
 
 chrome.runtime.onInstalled.addListener(async () => {
   await initializePrompts()
@@ -39,6 +41,21 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   const promptId = info.menuItemId.replace('prompt:', '')
   const selectedText = info.selectionText
 
+  // Pre-fill variables from settings
+  const prompts = await getPrompts()
+  const prompt = prompts.find(p => p.id === promptId)
+  const settings = await getSettings()
+  const variables = {}
+
+  if (prompt) {
+    const templateVars = parseVariables(prompt.template)
+    for (const v of templateVars) {
+      if (v.name === 'language' && settings.nativeLanguage) {
+        variables.language = settings.nativeLanguage
+      }
+    }
+  }
+
   await chrome.sidePanel.open({ tabId: tab.id })
   await chrome.sidePanel.setOptions({
     tabId: tab.id,
@@ -50,7 +67,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       type: 'PROMPT_SELECTED',
       promptId,
       selectedText,
-      variables: {},
+      variables,
     }).catch(() => {})
   }, 300)
 })
