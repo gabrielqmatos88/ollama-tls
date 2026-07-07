@@ -35,13 +35,7 @@ async function rebuildContextMenus() {
   }
 }
 
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (!info.menuItemId.startsWith('prompt:')) return
-
-  const promptId = info.menuItemId.replace('prompt:', '')
-  const selectedText = info.selectionText
-
-  // Pre-fill variables from settings
+async function getVariablesForPrompt(promptId) {
   const prompts = (await getPrompts()) || []
   const prompt = prompts.find(p => p.id === promptId)
   const settings = await getSettings()
@@ -56,52 +50,38 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
   }
 
+  return variables
+}
+
+async function openSidePanelWithPrompt(tabId, promptId, selectedText, variables) {
+  // Store the pending message first
+  await chrome.storage.local.set({
+    pendingPrompt: { promptId, selectedText, variables }
+  })
+
+  // Open the side panel
   try {
-    await chrome.sidePanel.open({ tabId: tab.id })
-    await chrome.sidePanel.setOptions({
-      tabId: tab.id,
-      enabled: true,
-    })
+    await chrome.sidePanel.open({ tabId })
+    await chrome.sidePanel.setOptions({ tabId, enabled: true })
   } catch (err) {
     console.error('Failed to open side panel:', err)
-    return
   }
+}
 
-  setTimeout(() => {
-    chrome.runtime.sendMessage({
-      type: 'PROMPT_SELECTED',
-      promptId,
-      selectedText,
-      variables,
-    }).catch(() => {})
-  }, 300)
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (!info.menuItemId.startsWith('prompt:')) return
+
+  const promptId = info.menuItemId.replace('prompt:', '')
+  const selectedText = info.selectionText
+  const variables = await getVariablesForPrompt(promptId)
+
+  await openSidePanelWithPrompt(tab.id, promptId, selectedText, variables)
 })
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'OPEN_SIDEBAR_WITH_PROMPT') {
     const { promptId, selectedText, variables } = message
-
-    try {
-      chrome.sidePanel.open({ tabId: sender.tab.id })
-      chrome.sidePanel.setOptions({
-        tabId: sender.tab.id,
-        enabled: true,
-      })
-    } catch (err) {
-      console.error('Failed to open side panel:', err)
-      sendResponse({ ok: false, error: err.message })
-      return true
-    }
-
-    setTimeout(() => {
-      chrome.runtime.sendMessage({
-        type: 'PROMPT_SELECTED',
-        promptId,
-        selectedText,
-        variables,
-      }).catch(() => {})
-    }, 300)
-
+    openSidePanelWithPrompt(sender.tab.id, promptId, selectedText, variables)
     sendResponse({ ok: true })
   }
   return true

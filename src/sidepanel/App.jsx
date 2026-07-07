@@ -35,7 +35,19 @@ export default function App() {
 
   useEffect(() => {
     loadConversation().then(setConversation)
+
+    // Check for pending prompt from background
+    checkPendingPrompt()
   }, [])
+
+  async function checkPendingPrompt() {
+    const result = await chrome.storage.local.get('pendingPrompt')
+    if (result.pendingPrompt) {
+      const { promptId, selectedText, variables } = result.pendingPrompt
+      await chrome.storage.local.remove('pendingPrompt')
+      handlePromptReceived(promptId, selectedText, variables)
+    }
+  }
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -48,7 +60,21 @@ export default function App() {
       }
     }
     chrome.runtime.onMessage.addListener(handleMessage)
-    return () => chrome.runtime.onMessage.removeListener(handleMessage)
+
+    // Also listen for storage changes (backup method)
+    const handleStorageChange = (changes, area) => {
+      if (area === 'local' && changes.pendingPrompt?.newValue) {
+        const { promptId, selectedText, variables } = changes.pendingPrompt.newValue
+        chrome.storage.local.remove('pendingPrompt')
+        handlePromptReceived(promptId, selectedText, variables)
+      }
+    }
+    chrome.storage.onChanged.addListener(handleStorageChange)
+
+    return () => {
+      chrome.runtime.onMessage.removeListener(handleMessage)
+      chrome.storage.onChanged.removeListener(handleStorageChange)
+    }
   }, [])
 
   async function handlePromptReceived(promptId, selectedText, variables) {
