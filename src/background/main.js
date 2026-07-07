@@ -16,7 +16,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
 async function rebuildContextMenus() {
   await chrome.contextMenus.removeAll()
 
-  const prompts = await getPrompts()
+  const prompts = (await getPrompts()) || []
   const contextPrompts = prompts.filter(p => p.showInContextMenu)
 
   chrome.contextMenus.create({
@@ -42,7 +42,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   const selectedText = info.selectionText
 
   // Pre-fill variables from settings
-  const prompts = await getPrompts()
+  const prompts = (await getPrompts()) || []
   const prompt = prompts.find(p => p.id === promptId)
   const settings = await getSettings()
   const variables = {}
@@ -56,11 +56,16 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
   }
 
-  await chrome.sidePanel.open({ tabId: tab.id })
-  await chrome.sidePanel.setOptions({
-    tabId: tab.id,
-    enabled: true,
-  })
+  try {
+    await chrome.sidePanel.open({ tabId: tab.id })
+    await chrome.sidePanel.setOptions({
+      tabId: tab.id,
+      enabled: true,
+    })
+  } catch (err) {
+    console.error('Failed to open side panel:', err)
+    return
+  }
 
   setTimeout(() => {
     chrome.runtime.sendMessage({
@@ -76,11 +81,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'OPEN_SIDEBAR_WITH_PROMPT') {
     const { promptId, selectedText, variables } = message
 
-    chrome.sidePanel.open({ tabId: sender.tab.id })
-    chrome.sidePanel.setOptions({
-      tabId: sender.tab.id,
-      enabled: true,
-    })
+    try {
+      chrome.sidePanel.open({ tabId: sender.tab.id })
+      chrome.sidePanel.setOptions({
+        tabId: sender.tab.id,
+        enabled: true,
+      })
+    } catch (err) {
+      console.error('Failed to open side panel:', err)
+      sendResponse({ ok: false, error: err.message })
+      return true
+    }
 
     setTimeout(() => {
       chrome.runtime.sendMessage({
