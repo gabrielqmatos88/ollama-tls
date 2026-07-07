@@ -22,15 +22,15 @@ async function rebuildContextMenus() {
 
   // Parent menu for selected text
   chrome.contextMenus.create({
-    id: 'ollama-tls',
-    title: 'ollama-tls',
+    id: 'ollama-scribe',
+    title: 'Ollama Scribe',
     contexts: ['selection'],
   })
 
   // Parent menu for textareas/input fields
   chrome.contextMenus.create({
-    id: 'ollama-tls-editable',
-    title: 'ollama-tls - Help compose',
+    id: 'ollama-scribe-editable',
+    title: 'Ollama Scribe - Help compose',
     contexts: ['editable'],
   })
 
@@ -39,7 +39,7 @@ async function rebuildContextMenus() {
     // For selected text
     chrome.contextMenus.create({
       id: `prompt:${prompt.id}`,
-      parentId: 'ollama-tls',
+      parentId: 'ollama-scribe',
       title: prompt.name,
       contexts: ['selection'],
     })
@@ -47,7 +47,7 @@ async function rebuildContextMenus() {
     // For textareas
     chrome.contextMenus.create({
       id: `compose:${prompt.id}`,
-      parentId: 'ollama-tls-editable',
+      parentId: 'ollama-scribe-editable',
       title: prompt.name,
       contexts: ['editable'],
     })

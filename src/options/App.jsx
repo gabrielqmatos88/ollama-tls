@@ -14,7 +14,7 @@ export default function App() {
 
   return (
     <div className="options-container">
-      <h1>ollama-tls</h1>
+      <h1>Ollama Scribe</h1>
       <nav className="tabs">
         {TABS.map(tab => (
           <button

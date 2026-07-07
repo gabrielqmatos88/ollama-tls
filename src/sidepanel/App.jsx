@@ -158,7 +158,7 @@ export default function App() {
   return (
     <>
       <div className="chat-header">
-        <h2>ollama-tls</h2>
+        <h2>Ollama Scribe</h2>
         <div style={{ display: 'flex', gap: 8 }}>
           {isStreaming && <button className="stop-btn" onClick={handleStop}>Stop</button>}
           <button className="btn btn-secondary" onClick={handleNewConversation} style={{ padding: '4px 12px', fontSize: 13 }}>New</button>

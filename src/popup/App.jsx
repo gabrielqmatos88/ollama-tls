@@ -17,7 +17,7 @@ export default function App() {
 
   return (
     <div className="popup-container">
-      <h2>ollama-tls</h2>
+      <h2>Ollama Scribe</h2>
       <p className="popup-desc">AI text transformation</p>
       <div className="popup-actions">
         <button className="btn btn-primary" onClick={handleOpenSidePanel}>Open Chat</button>
