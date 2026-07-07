@@ -11,6 +11,11 @@ export default defineManifest({
   permissions: [
     'sidePanel',
     'contentSettings',
+    'contextMenus',
+    'storage',
+  ],
+  host_permissions: [
+    '<all_urls>',
   ],
   action: {
     default_icon: {
@@ -25,4 +30,5 @@ export default defineManifest({
   side_panel: {
     default_path: 'src/sidepanel/index.html',
   },
+  options_page: 'src/options/index.html',
 })
