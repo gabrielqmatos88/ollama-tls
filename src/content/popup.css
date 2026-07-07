@@ -1,0 +1,106 @@
+.crjsx-prompt-popup {
+  position: absolute;
+  z-index: 2147483647;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  min-width: 200px;
+  max-width: 320px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+.crjsx-prompt-popup .prompt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.crjsx-prompt-popup .prompt-item {
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+}
+
+.crjsx-prompt-popup .prompt-item:hover {
+  background: #f3f4f6;
+}
+
+.crjsx-prompt-popup .variables-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.crjsx-prompt-popup .variables-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #555;
+}
+
+.crjsx-prompt-popup .variables-form input,
+.crjsx-prompt-popup .variables-form textarea,
+.crjsx-prompt-popup .variables-form select {
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.crjsx-prompt-popup .variables-form .radio-group {
+  display: flex;
+  gap: 12px;
+}
+
+.crjsx-prompt-popup .variables-form .radio-group label {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.crjsx-prompt-popup .variables-form .checkbox-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.crjsx-prompt-popup .form-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.crjsx-prompt-popup .btn-confirm {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.crjsx-prompt-popup .btn-confirm:hover {
+  background: #1d4ed8;
+}
+
+.crjsx-prompt-popup .btn-cancel {
+  padding: 6px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+}
