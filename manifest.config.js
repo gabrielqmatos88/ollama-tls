@@ -14,6 +14,10 @@ export default defineManifest({
     'contextMenus',
     'storage',
   ],
+  background: {
+    service_worker: 'src/background/main.js',
+    type: 'module',
+  },
   host_permissions: [
     '<all_urls>',
   ],
