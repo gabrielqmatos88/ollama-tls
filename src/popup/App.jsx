@@ -1,22 +1,28 @@
-import crxLogo from '@/assets/crx.svg'
-import reactLogo from '@/assets/react.svg'
-import viteLogo from '@/assets/vite.svg'
-import HelloWorld from '@/components/HelloWorld'
 import './App.css'
 
 export default function App() {
+  function handleOpenSidePanel() {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]) {
+        chrome.sidePanel.open({ tabId: tabs[0].id })
+      }
+    })
+    window.close()
+  }
+
+  function handleOpenOptions() {
+    chrome.runtime.openOptionsPage()
+    window.close()
+  }
+
   return (
-    <div>
-      <a href="https://vite.dev" target="_blank" rel="noreferrer">
-        <img src={viteLogo} className="logo" alt="Vite logo" />
-      </a>
-      <a href="https://reactjs.org/" target="_blank" rel="noreferrer">
-        <img src={reactLogo} className="logo react" alt="React logo" />
-      </a>
-      <a href="https://crxjs.dev/vite-plugin" target="_blank" rel="noreferrer">
-        <img src={crxLogo} className="logo crx" alt="crx logo" />
-      </a>
-      <HelloWorld msg="Vite + React + CRXJS" />
+    <div className="popup-container">
+      <h2>ollama-tls</h2>
+      <p className="popup-desc">AI text transformation</p>
+      <div className="popup-actions">
+        <button className="btn btn-primary" onClick={handleOpenSidePanel}>Open Chat</button>
+        <button className="btn btn-secondary" onClick={handleOpenOptions}>Settings</button>
+      </div>
     </div>
   )
 }
