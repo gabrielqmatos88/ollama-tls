@@ -20,18 +20,36 @@ async function rebuildContextMenus() {
   const prompts = (await getPrompts()) || []
   const contextPrompts = prompts.filter(p => p.showInContextMenu)
 
+  // Parent menu for selected text
   chrome.contextMenus.create({
     id: 'ollama-tls',
     title: 'ollama-tls',
     contexts: ['selection'],
   })
 
+  // Parent menu for textareas/input fields
+  chrome.contextMenus.create({
+    id: 'ollama-tls-editable',
+    title: 'ollama-tls - Help compose',
+    contexts: ['editable'],
+  })
+
+  // Add prompts to both menus
   for (const prompt of contextPrompts) {
+    // For selected text
     chrome.contextMenus.create({
       id: `prompt:${prompt.id}`,
       parentId: 'ollama-tls',
       title: prompt.name,
       contexts: ['selection'],
+    })
+
+    // For textareas
+    chrome.contextMenus.create({
+      id: `compose:${prompt.id}`,
+      parentId: 'ollama-tls-editable',
+      title: prompt.name,
+      contexts: ['editable'],
     })
   }
 }
@@ -55,25 +73,50 @@ async function getVariablesForPrompt(promptId) {
 }
 
 async function sendToSidePanel(data) {
-  // Store the message
   await chrome.storage.local.set({
     messageBus_pending: [{ type: 'PROMPT_SELECTED', data, timestamp: Date.now() }]
   })
 }
 
+async function sendToContentScript(tabId, data) {
+  await chrome.storage.local.set({
+    textareaCompose: data
+  })
+  
+  // Also try direct message
+  chrome.tabs.sendMessage(tabId, {
+    type: 'TEXTAREA_COMPOSE',
+    ...data
+  }).catch(() => {})
+}
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (!info.menuItemId.startsWith('prompt:')) return
+  const { menuItemId } = info
 
-  const promptId = info.menuItemId.replace('prompt:', '')
-  const selectedText = info.selectionText
-  const variables = await getVariablesForPrompt(promptId)
+  // Handle selected text prompts (original behavior)
+  if (menuItemId.startsWith('prompt:')) {
+    const promptId = menuItemId.replace('prompt:', '')
+    const selectedText = info.selectionText
+    const variables = await getVariablesForPrompt(promptId)
+    const windowId = tab.windowId
 
-  // Get or open side panel
-  const windowId = tab.windowId
-  await sidePanelManager.getOrOpen(windowId)
+    await sidePanelManager.getOrOpen(windowId)
+    await sendToSidePanel({ promptId, selectedText, variables })
+    return
+  }
 
-  // Send the message
-  await sendToSidePanel({ promptId, selectedText, variables })
+  // Handle textarea compose prompts
+  if (menuItemId.startsWith('compose:')) {
+    const promptId = menuItemId.replace('compose:', '')
+    const variables = await getVariablesForPrompt(promptId)
+
+    // Send to content script to handle textarea interaction
+    await sendToContentScript(tab.id, {
+      promptId,
+      variables,
+    })
+    return
+  }
 })
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

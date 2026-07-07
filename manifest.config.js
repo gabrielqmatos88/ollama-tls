@@ -27,10 +27,17 @@ export default defineManifest({
     },
     default_popup: 'src/popup/index.html',
   },
-  content_scripts: [{
-    js: ['src/content/main.jsx'],
-    matches: ['https://*/*'],
-  }],
+  content_scripts: [
+    {
+      js: ['src/content/main.jsx'],
+      matches: ['https://*/*'],
+    },
+    {
+      js: ['src/content/textareaCompose.jsx'],
+      matches: ['https://*/*'],
+      run_at: 'document_idle',
+    }
+  ],
   side_panel: {
     default_path: 'src/sidepanel/index.html',
   },
