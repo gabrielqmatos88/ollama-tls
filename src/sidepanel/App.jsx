@@ -5,6 +5,7 @@ import { getPrompts } from '@/storage/prompts'
 import { getDefaultProvider } from '@/storage/providers'
 import { replaceVariables } from '@/utils/templateParser'
 import { callProvider } from '@/api/client.js'
+import { onMessage, checkPending } from '@/utils/messageBus'
 import './App.css'
 
 const CONVERSATIONS_KEY = 'conversations'
@@ -36,46 +37,22 @@ export default function App() {
   useEffect(() => {
     loadConversation().then(setConversation)
 
-    // Check for pending prompt from background
-    checkPendingPrompt()
-  }, [])
+    // Subscribe to MessageBus
+    const unsubscribe = onMessage((message) => {
+      if (message.type === 'PROMPT_SELECTED') {
+        handlePromptReceived(message.data.promptId, message.data.selectedText, message.data.variables)
+      }
+    })
 
-  async function checkPendingPrompt() {
-    const result = await chrome.storage.local.get('pendingPrompt')
-    if (result.pendingPrompt) {
-      const { promptId, selectedText, variables } = result.pendingPrompt
-      await chrome.storage.local.remove('pendingPrompt')
-      handlePromptReceived(promptId, selectedText, variables)
-    }
-  }
+    // Check for any pending messages
+    checkPending()
+
+    return unsubscribe
+  }, [])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [conversation?.messages, streamingContent])
-
-  useEffect(() => {
-    function handleMessage(message) {
-      if (message.type === 'PROMPT_SELECTED') {
-        handlePromptReceived(message.promptId, message.selectedText, message.variables)
-      }
-    }
-    chrome.runtime.onMessage.addListener(handleMessage)
-
-    // Also listen for storage changes (backup method)
-    const handleStorageChange = (changes, area) => {
-      if (area === 'local' && changes.pendingPrompt?.newValue) {
-        const { promptId, selectedText, variables } = changes.pendingPrompt.newValue
-        chrome.storage.local.remove('pendingPrompt')
-        handlePromptReceived(promptId, selectedText, variables)
-      }
-    }
-    chrome.storage.onChanged.addListener(handleStorageChange)
-
-    return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage)
-      chrome.storage.onChanged.removeListener(handleStorageChange)
-    }
-  }, [])
 
   async function handlePromptReceived(promptId, selectedText, variables) {
     const prompts = (await getPrompts()) || []

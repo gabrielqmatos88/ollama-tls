@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import PromptPopup from './PromptPopup.jsx'
+import { sendMessage } from '@/utils/messageBus'
 import './popup.css'
 
 let popupContainer = null
@@ -44,13 +45,16 @@ function hidePopup() {
   }
 }
 
-function handleSend(promptId, selectedText, variables) {
-  chrome.runtime.sendMessage({
-    type: 'OPEN_SIDEBAR_WITH_PROMPT',
+async function handleSend(promptId, selectedText, variables) {
+  // Get the current tab ID
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+  
+  await sendMessage('PROMPT_FROM_CONTENT', {
     promptId,
     selectedText,
     variables,
-  })
+  }, { openSidePanel: true, tabId: tab.id })
+
   hidePopup()
 }
 
