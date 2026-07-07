@@ -27,6 +27,7 @@ export default function App() {
   const abortRef = useRef(null)
   const messagesEndRef = useRef(null)
   const conversationRef = useRef(conversation)
+  const streamingContentRef = useRef('')
 
   useEffect(() => {
     conversationRef.current = conversation
@@ -81,6 +82,7 @@ export default function App() {
     }
 
     setIsStreaming(true)
+    streamingContentRef.current = ''
     setStreamingContent('')
     abortRef.current = new AbortController()
 
@@ -93,17 +95,22 @@ export default function App() {
         model: provider.model,
         messages: aiMessages,
         signal: abortRef.current.signal,
-        onChunk: (delta, full) => setStreamingContent(full),
+        onChunk: (delta, full) => {
+          streamingContentRef.current = full
+          setStreamingContent(full)
+        },
       })
     } catch (err) {
       if (err.name === 'AbortError') {
         // User stopped generation
       } else {
-        setStreamingContent(`Error: ${err.message}`)
+        const errorMsg = `Error: ${err.message}`
+        streamingContentRef.current = errorMsg
+        setStreamingContent(errorMsg)
       }
     } finally {
       setIsStreaming(false)
-      const finalContent = streamingContent || ''
+      const finalContent = streamingContentRef.current || ''
       if (finalContent) {
         const current = conversationRef.current
         const assistantMsg = { id: crypto.randomUUID(), role: 'assistant', content: finalContent }
@@ -111,6 +118,7 @@ export default function App() {
         setConversation(updated)
         await saveConversation(updated)
       }
+      streamingContentRef.current = ''
       setStreamingContent('')
       abortRef.current = null
     }
