@@ -97,10 +97,17 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (menuItemId.startsWith('prompt:')) {
     const promptId = menuItemId.replace('prompt:', '')
     const selectedText = info.selectionText
-    const variables = await getVariablesForPrompt(promptId)
     const windowId = tab.windowId
 
-    await sidePanelManager.getOrOpen(windowId)
+    // Open side panel FIRST while user gesture is still active
+    try {
+      await chrome.sidePanel.open({ windowId })
+    } catch (err) {
+      console.error('Failed to open side panel:', err)
+    }
+
+    // Now do async work to get variables and send message
+    const variables = await getVariablesForPrompt(promptId)
     await sendToSidePanel({ promptId, selectedText, variables })
     return
   }
@@ -125,7 +132,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const windowId = sender.tab?.windowId
 
     if (windowId) {
-      sidePanelManager.getOrOpen(windowId).then(() => {
+      // Open side panel FIRST while user gesture is still active
+      chrome.sidePanel.open({ windowId }).then(() => {
+        sendToSidePanel({ promptId, selectedText, variables })
+      }).catch(err => {
+        console.error('Failed to open side panel:', err)
+        // Still send the message even if panel failed to open
         sendToSidePanel({ promptId, selectedText, variables })
       })
     }
