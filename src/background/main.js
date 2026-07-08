@@ -9,6 +9,9 @@ chrome.runtime.onInstalled.addListener(async () => {
   await rebuildContextMenus()
 })
 
+// Open side panel when clicking extension icon
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
+
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes.prompts) {
     rebuildContextMenus()

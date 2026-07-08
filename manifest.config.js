@@ -14,6 +14,7 @@ export default defineManifest({
     'contextMenus',
     'storage',
     'clipboardWrite',
+    'scripting',
   ],
   background: {
     service_worker: 'src/background/main.js',
@@ -26,7 +27,6 @@ export default defineManifest({
     default_icon: {
       48: 'public/logo.png',
     },
-    default_popup: 'src/popup/index.html',
   },
   content_scripts: [
     {
