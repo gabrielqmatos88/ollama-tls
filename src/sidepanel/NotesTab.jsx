@@ -10,7 +10,7 @@ export default function NotesTab() {
   const [prompt, setPrompt] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
   const [streamingContent, setStreamingContent] = useState('')
-  const [document, setDocument] = useState(null)
+  const [docContent, setDocContent] = useState(null)
   const [adjustPrompt, setAdjustPrompt] = useState('')
   const abortRef = useRef(null)
 
@@ -81,13 +81,13 @@ export default function NotesTab() {
 
     const provider = await getDefaultProvider()
     if (!provider) {
-      setDocument('Error: No provider configured. Please add a provider in the options page.')
+      setDocContent('Error: No provider configured. Please add a provider in the options page.')
       return
     }
 
     setIsStreaming(true)
     setStreamingContent('')
-    setDocument(null)
+    setDocContent(null)
     setAdjustPrompt('')
     abortRef.current = new AbortController()
 
@@ -104,10 +104,10 @@ export default function NotesTab() {
           setStreamingContent(fullText)
         },
       })
-      setDocument(full)
+      setDocContent(full)
     } catch (err) {
       if (err.name !== 'AbortError') {
-        setDocument(`Error: ${err.message}`)
+        setDocContent(`Error: ${err.message}`)
       }
     } finally {
       setIsStreaming(false)
@@ -117,13 +117,13 @@ export default function NotesTab() {
   }
 
   async function handleApply() {
-    if (!adjustPrompt.trim() || !document || isStreaming) return
+    if (!adjustPrompt.trim() || !docContent || isStreaming) return
 
-    const fullPrompt = `${adjustPrompt.trim()}\n\n--- Current Document ---\n${document}`
+    const fullPrompt = `${adjustPrompt.trim()}\n\n--- Current Document ---\n${docContent}`
 
     const provider = await getDefaultProvider()
     if (!provider) {
-      setDocument('Error: No provider configured.')
+      setDocContent('Error: No provider configured.')
       return
     }
 
@@ -144,11 +144,11 @@ export default function NotesTab() {
           setStreamingContent(fullText)
         },
       })
-      setDocument(full)
+      setDocContent(full)
       setAdjustPrompt('')
     } catch (err) {
       if (err.name !== 'AbortError') {
-        setDocument(`Error: ${err.message}`)
+        setDocContent(`Error: ${err.message}`)
       }
     } finally {
       setIsStreaming(false)
@@ -162,7 +162,7 @@ export default function NotesTab() {
   }
 
   function handleDownload() {
-    const content = document || streamingContent
+    const content = docContent || streamingContent
     if (!content) return
     const blob = new Blob([content], { type: 'text/markdown' })
     const url = URL.createObjectURL(blob)
@@ -174,27 +174,27 @@ export default function NotesTab() {
   }
 
   function handleNewGeneration() {
-    setDocument(null)
+    setDocContent(null)
     setStreamingContent('')
     setAdjustPrompt('')
   }
 
   function handleBack() {
-    setDocument(null)
+    setDocContent(null)
     setStreamingContent('')
     setAdjustPrompt('')
   }
 
   // Editor view
-  if (document !== null || isStreaming) {
-    const displayContent = document || streamingContent
+  if (docContent !== null || isStreaming) {
+    const displayContent = docContent || streamingContent
     return (
       <div className="notes-editor">
         <div className="notes-editor-content">
           <textarea
             className="notes-editor-textarea"
             value={displayContent}
-            onChange={e => setDocument(e.target.value)}
+            onChange={e => setDocContent(e.target.value)}
             disabled={isStreaming}
             placeholder="Generated content will appear here..."
           />
