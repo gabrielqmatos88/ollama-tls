@@ -14,7 +14,7 @@ export default function PromptPopup({ selectedText, position, onSend, onClose })
 
   useEffect(() => {
     async function load() {
-      const allPrompts = await getPrompts()
+      const allPrompts = (await getPrompts()) || []
       setPrompts(allPrompts.filter(p => p.showInContextMenu))
       const s = await getSettings()
       setSettings(s)
