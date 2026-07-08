@@ -14,6 +14,9 @@ export default function ProvidersTab() {
   const [editing, setEditing] = useState(null) // null | 'new' | provider id
   const [form, setForm] = useState(EMPTY_PROVIDER)
   const [testResult, setTestResult] = useState(null)
+  const [modelList, setModelList] = useState(null)
+  const [modelLoading, setModelLoading] = useState(false)
+  const [modelError, setModelError] = useState(null)
 
   useEffect(() => {
     loadProviders()
@@ -28,18 +31,24 @@ export default function ProvidersTab() {
     setForm({ ...EMPTY_PROVIDER })
     setEditing('new')
     setTestResult(null)
+    setModelList(null)
+    setModelError(null)
   }
 
   function startEdit(provider) {
     setForm({ ...provider })
     setEditing(provider.id)
     setTestResult(null)
+    setModelList(null)
+    setModelError(null)
   }
 
   function cancelEdit() {
     setEditing(null)
     setForm(EMPTY_PROVIDER)
     setTestResult(null)
+    setModelList(null)
+    setModelError(null)
   }
 
   async function handleSave() {
@@ -93,6 +102,22 @@ export default function ProvidersTab() {
     }
   }
 
+  async function handleLoadModels() {
+    if (!form.baseUrl) return
+    setModelLoading(true)
+    setModelError(null)
+    try {
+      const { fetchModels } = await import('@/api/client.js')
+      const models = await fetchModels({ baseUrl: form.baseUrl, apiKey: form.apiKey })
+      setModelList(models.map(m => m.id || m))
+    } catch (err) {
+      setModelError(`Error: ${err.message}`)
+      setModelList(null)
+    } finally {
+      setModelLoading(false)
+    }
+  }
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -131,11 +156,42 @@ export default function ProvidersTab() {
             </label>
             <label>
               Model
-              <input
-                value={form.model}
-                onChange={e => setForm({ ...form, model: e.target.value })}
-                placeholder="llama3.2"
-              />
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                {modelList ? (
+                  <select
+                    value={form.model}
+                    onChange={e => {
+                      if (e.target.value === '__manual__') {
+                        setModelList(null)
+                      } else {
+                        setForm({ ...form, model: e.target.value })
+                      }
+                    }}
+                    style={{ flex: 1 }}
+                  >
+                    <option value="__manual__">— enter manually —</option>
+                    {modelList.map(m => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    value={form.model}
+                    onChange={e => setForm({ ...form, model: e.target.value })}
+                    placeholder="llama3.2"
+                    style={{ flex: 1 }}
+                  />
+                )}
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleLoadModels}
+                  disabled={modelLoading || !form.baseUrl}
+                  style={{ whiteSpace: 'nowrap' }}
+                >
+                  {modelLoading ? 'Loading...' : 'Load Models'}
+                </button>
+              </div>
+              {modelError && <span style={{ fontSize: 13, color: '#dc2626' }}>{modelError}</span>}
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <input
