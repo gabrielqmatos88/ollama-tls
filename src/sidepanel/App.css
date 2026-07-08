@@ -160,3 +160,97 @@ body {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
+
+.prompt-bar {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px 16px;
+}
+
+.prompt-bar-row {
+  display: flex;
+  gap: 8px;
+}
+
+.prompt-bar-row select {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  background: white;
+}
+
+.prompt-bar-row select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.prompt-bar-variables {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.prompt-bar-variables > label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #555;
+}
+
+.prompt-bar-variables input[type="text"],
+.prompt-bar-variables input[type="number"],
+.prompt-bar-variables textarea,
+.prompt-bar-variables select {
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.prompt-bar-variables input:focus,
+.prompt-bar-variables textarea:focus,
+.prompt-bar-variables select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.prompt-bar-variables .radio-group {
+  display: flex;
+  gap: 12px;
+}
+
+.prompt-bar-variables .radio-group label {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.prompt-bar-variables .checkbox-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.prompt-bar-variables .btn {
+  align-self: flex-end;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.prompt-bar-variables .btn:hover {
+  background: #1d4ed8;
+}
+
+.prompt-bar-variables .btn:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
