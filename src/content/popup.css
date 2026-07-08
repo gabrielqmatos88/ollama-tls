@@ -104,3 +104,21 @@
   font-size: 13px;
   color: #555;
 }
+
+.copy-markdown-btn {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  cursor: pointer;
+  font-size: 13px;
+  color: #374151;
+  text-align: center;
+}
+
+.copy-markdown-btn:hover {
+  background: #f3f4f6;
+}

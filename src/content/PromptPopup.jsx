@@ -3,11 +3,12 @@ import { getPrompts } from '@/storage/prompts'
 import { getSettings } from '@/storage/settings'
 import { parseVariables } from '@/utils/templateParser'
 
-export default function PromptPopup({ selectedText, position, onSend, onClose }) {
+export default function PromptPopup({ selectedText, markdownText, position, onSend, onClose }) {
   const [prompts, setPrompts] = useState([])
   const [selectedPrompt, setSelectedPrompt] = useState(null)
   const [variableValues, setVariableValues] = useState({})
   const [settings, setSettings] = useState({})
+  const [copied, setCopied] = useState(false)
   const popupRef = useRef(null)
 
   useEffect(() => {
@@ -37,10 +38,20 @@ export default function PromptPopup({ selectedText, position, onSend, onClose })
     }
   }, [onClose])
 
+  async function handleCopyMarkdown() {
+    try {
+      await navigator.clipboard.writeText(markdownText || selectedText)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
   function handlePromptClick(prompt) {
     const variables = parseVariables(prompt.template)
     if (variables.length === 0) {
-      onSend(prompt.id, selectedText, {})
+      onSend(prompt.id, markdownText || selectedText, {})
       return
     }
     const defaults = {}
@@ -53,13 +64,19 @@ export default function PromptPopup({ selectedText, position, onSend, onClose })
   }
 
   function handleConfirm() {
-    onSend(selectedPrompt.id, selectedText, variableValues)
+    onSend(selectedPrompt.id, markdownText || selectedText, variableValues)
   }
 
   const variables = selectedPrompt ? parseVariables(selectedPrompt.template) : []
 
   return (
     <div className="crjsx-prompt-popup" ref={popupRef} style={{ top: position.top, left: position.left }}>
+      <button
+        className="copy-markdown-btn"
+        onClick={handleCopyMarkdown}
+      >
+        {copied ? 'Copied!' : 'Copy as Markdown'}
+      </button>
       {!selectedPrompt ? (
         <div className="prompt-list">
           {prompts.map(prompt => (
