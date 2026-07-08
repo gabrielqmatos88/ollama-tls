@@ -10,7 +10,8 @@ export default function NotesTab() {
   const [prompt, setPrompt] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
   const [streamingContent, setStreamingContent] = useState('')
-  const [result, setResult] = useState(null)
+  const [document, setDocument] = useState(null)
+  const [adjustPrompt, setAdjustPrompt] = useState('')
   const abortRef = useRef(null)
 
   useEffect(() => {
@@ -80,13 +81,14 @@ export default function NotesTab() {
 
     const provider = await getDefaultProvider()
     if (!provider) {
-      setResult('Error: No provider configured. Please add a provider in the options page.')
+      setDocument('Error: No provider configured. Please add a provider in the options page.')
       return
     }
 
     setIsStreaming(true)
     setStreamingContent('')
-    setResult(null)
+    setDocument(null)
+    setAdjustPrompt('')
     abortRef.current = new AbortController()
 
     try {
@@ -102,10 +104,51 @@ export default function NotesTab() {
           setStreamingContent(fullText)
         },
       })
-      setResult(full)
+      setDocument(full)
     } catch (err) {
       if (err.name !== 'AbortError') {
-        setResult(`Error: ${err.message}`)
+        setDocument(`Error: ${err.message}`)
+      }
+    } finally {
+      setIsStreaming(false)
+      setStreamingContent('')
+      abortRef.current = null
+    }
+  }
+
+  async function handleApply() {
+    if (!adjustPrompt.trim() || !document || isStreaming) return
+
+    const fullPrompt = `${adjustPrompt.trim()}\n\n--- Current Document ---\n${document}`
+
+    const provider = await getDefaultProvider()
+    if (!provider) {
+      setDocument('Error: No provider configured.')
+      return
+    }
+
+    setIsStreaming(true)
+    setStreamingContent('')
+    abortRef.current = new AbortController()
+
+    try {
+      let full = ''
+      await callProvider({
+        baseUrl: provider.baseUrl,
+        apiKey: provider.apiKey,
+        model: provider.model,
+        messages: [{ role: 'user', content: fullPrompt }],
+        signal: abortRef.current.signal,
+        onChunk: (delta, fullText) => {
+          full = fullText
+          setStreamingContent(fullText)
+        },
+      })
+      setDocument(full)
+      setAdjustPrompt('')
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setDocument(`Error: ${err.message}`)
       }
     } finally {
       setIsStreaming(false)
@@ -119,7 +162,7 @@ export default function NotesTab() {
   }
 
   function handleDownload() {
-    const content = result || streamingContent
+    const content = document || streamingContent
     if (!content) return
     const blob = new Blob([content], { type: 'text/markdown' })
     const url = URL.createObjectURL(blob)
@@ -131,24 +174,50 @@ export default function NotesTab() {
   }
 
   function handleNewGeneration() {
-    setResult(null)
+    setDocument(null)
     setStreamingContent('')
+    setAdjustPrompt('')
   }
 
   function handleBack() {
-    setResult(null)
+    setDocument(null)
     setStreamingContent('')
+    setAdjustPrompt('')
   }
 
-  if (result !== null || isStreaming) {
-    const displayContent = result || streamingContent
+  // Editor view
+  if (document !== null || isStreaming) {
+    const displayContent = document || streamingContent
     return (
-      <div className="notes-result">
-        <div className="notes-result-content">
-          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0 }}>{displayContent}</pre>
+      <div className="notes-editor">
+        <div className="notes-editor-content">
+          <textarea
+            className="notes-editor-textarea"
+            value={displayContent}
+            onChange={e => setDocument(e.target.value)}
+            disabled={isStreaming}
+            placeholder="Generated content will appear here..."
+          />
           {isStreaming && <span className="streaming-indicator" />}
         </div>
-        <div className="notes-result-actions">
+        <div className="notes-editor-prompt">
+          <textarea
+            className="notes-prompt"
+            value={adjustPrompt}
+            onChange={e => setAdjustPrompt(e.target.value)}
+            placeholder="Ask AI to adjust the document..."
+            rows={2}
+            disabled={isStreaming}
+          />
+          <button
+            className="btn btn-primary"
+            onClick={handleApply}
+            disabled={!adjustPrompt.trim() || isStreaming}
+          >
+            {isStreaming ? 'Generating...' : 'Apply'}
+          </button>
+        </div>
+        <div className="notes-editor-actions">
           {!isStreaming && (
             <>
               <button className="btn btn-primary" onClick={handleDownload}>Download .md</button>
