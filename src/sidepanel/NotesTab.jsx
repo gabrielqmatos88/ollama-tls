@@ -130,6 +130,11 @@ export default function NotesTab() {
     URL.revokeObjectURL(url)
   }
 
+  function handleNewGeneration() {
+    setResult(null)
+    setStreamingContent('')
+  }
+
   function handleBack() {
     setResult(null)
     setStreamingContent('')
@@ -147,6 +152,7 @@ export default function NotesTab() {
           {!isStreaming && (
             <>
               <button className="btn btn-primary" onClick={handleDownload}>Download .md</button>
+              <button className="btn btn-secondary" onClick={handleNewGeneration}>New generation</button>
               <button className="btn btn-secondary" onClick={handleBack}>Back to notes</button>
             </>
           )}
@@ -184,7 +190,7 @@ export default function NotesTab() {
                 </div>
                 {note.sourceTitle && (
                   <div className="note-source">
-                    {note.sourceUrl ? (
+                    {note.sourceUrl && (note.sourceUrl.startsWith('http://') || note.sourceUrl.startsWith('https://')) ? (
                       <a href={note.sourceUrl} target="_blank" rel="noopener noreferrer">{note.sourceTitle}</a>
                     ) : (
                       <span>{note.sourceTitle}</span>

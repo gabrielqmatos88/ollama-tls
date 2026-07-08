@@ -139,7 +139,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const selectedText = info.selectionText
     const sourceUrl = tab.url || ''
     const sourceTitle = tab.title || ''
-    await addNote({ text: selectedText, sourceUrl, sourceTitle })
+    try {
+      await addNote({ text: selectedText, sourceUrl, sourceTitle })
+    } catch (err) {
+      console.error('Failed to save note:', err)
+    }
     return
   }
 })
