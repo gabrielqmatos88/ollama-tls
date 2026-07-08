@@ -1,3 +1,4 @@
+import { addNote } from '@/storage/notes'
 import { getPrompts, initializePrompts } from '@/storage/prompts'
 import { getSettings } from '@/storage/settings'
 import { parseVariables } from '@/utils/templateParser'
@@ -52,6 +53,14 @@ async function rebuildContextMenus() {
       contexts: ['editable'],
     })
   }
+
+  // Add "Save as Note" item
+  chrome.contextMenus.create({
+    id: 'save-note',
+    parentId: 'ollama-scribe',
+    title: 'Save as Note',
+    contexts: ['selection'],
+  })
 }
 
 async function getVariablesForPrompt(promptId) {
@@ -122,6 +131,15 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       promptId,
       variables,
     })
+    return
+  }
+
+  // Handle save as note
+  if (menuItemId === 'save-note') {
+    const selectedText = info.selectionText
+    const sourceUrl = tab.url || ''
+    const sourceTitle = tab.title || ''
+    await addNote({ text: selectedText, sourceUrl, sourceTitle })
     return
   }
 })
