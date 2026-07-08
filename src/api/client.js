@@ -70,3 +70,28 @@ export async function callProvider({ baseUrl, apiKey, model, messages, signal, o
 
   return fullText
 }
+
+export async function fetchModels({ baseUrl, apiKey }) {
+  const url = `${baseUrl.replace(/\/+$/, '')}/models`
+
+  const headers = {
+    'Content-Type': 'application/json',
+  }
+  if (apiKey) {
+    headers['Authorization'] = `Bearer ${apiKey}`
+  }
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 10000)
+
+  try {
+    const response = await fetch(url, { headers, signal: controller.signal })
+    clearTimeout(timeout)
+    if (!response.ok) throw new Error(`API error ${response.status}`)
+    const data = await response.json()
+    return data.data || data
+  } catch (err) {
+    clearTimeout(timeout)
+    throw err
+  }
+}
