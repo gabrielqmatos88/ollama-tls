@@ -23,7 +23,7 @@ Sits above `ChatInput` in the side panel layout. Contains:
 - When a prompt is selected, its variables (from `parseVariables()`) render as input fields
 - Input types: text, number, textarea, boolean (checkbox), select (dropdown), radio (radio buttons)
 - Pre-filled from the last run of that prompt (stored in React state)
-- `{text}` is treated as a regular variable — the user types or pastes the text to translate/transform into the input field (unlike the content script popup where it's auto-filled from selection)
+- `{text}` is treated as a regular variable with no pre-fill — the user types or pastes the text into the input field (unlike the content script popup where it's auto-filled from selection)
 
 ### Provider Override
 - Dropdown of all configured providers (from `getProviders()`)
