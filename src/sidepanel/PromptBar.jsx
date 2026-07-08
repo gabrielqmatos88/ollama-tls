@@ -30,7 +30,9 @@ export default function PromptBar({ onSend, disabled }) {
   }, [])
 
   const selectedPrompt = prompts.find(p => p.id === selectedPromptId)
-  const variables = selectedPrompt ? parseVariables(selectedPrompt.template) : []
+  const parsedVariables = selectedPrompt ? parseVariables(selectedPrompt.template) : []
+  const hasText = selectedPrompt ? /\{text[^}]*\}/.test(selectedPrompt.template) : false
+  const variables = hasText ? [{ name: 'text', type: 'textarea' }, ...parsedVariables] : parsedVariables
 
   function handlePromptChange(promptId) {
     setSelectedPromptId(promptId)
@@ -42,9 +44,11 @@ export default function PromptBar({ onSend, disabled }) {
     const prompt = prompts.find(p => p.id === promptId)
     if (!prompt) return
     const vars = parseVariables(prompt.template)
+    const hasText = /\{text[^}]*\}/.test(prompt.template)
+    const allVars = hasText ? [{ name: 'text', type: 'textarea' }, ...vars] : vars
     const defaults = { ...previousValues }
     if (settings.nativeLanguage) {
-      const langVar = vars.find(v => v.name === 'language')
+      const langVar = allVars.find(v => v.name === 'language')
       if (langVar && !defaults.language) defaults.language = settings.nativeLanguage
     }
     setVariableValues(defaults)

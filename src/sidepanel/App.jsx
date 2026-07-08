@@ -154,7 +154,7 @@ export default function App() {
     const prompt = prompts.find(p => p.id === promptId)
     if (!prompt) return
 
-    const content = replaceVariables(prompt.template, '', variables)
+    const content = replaceVariables(prompt.template, variables.text || '', variables)
     const current = conversationRef.current
     const newMessage = { id: crypto.randomUUID(), role: 'user', content }
     const updated = {
