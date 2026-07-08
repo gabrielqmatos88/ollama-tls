@@ -4,31 +4,31 @@ const DEFAULT_PROMPTS = [
   {
     id: 'default-translate-en',
     name: 'Translate to English',
-    template: 'Translate the following text to English:\n\n{text}',
+    template: 'Translate the following text to English. Output ONLY the translation, no explanations or notes.\n\n{text}',
     showInContextMenu: true,
   },
   {
     id: 'default-translate-native',
     name: 'Translate to Native',
-    template: 'Translate to {language}:\n\n{text}',
+    template: 'Translate the following text to {language}. Output ONLY the translation, no explanations or notes.\n\n{text}',
     showInContextMenu: true,
   },
   {
     id: 'default-correct-grammar',
     name: 'Correct Grammar',
-    template: 'Correct the grammar and fix typos:\n\n{text}',
+    template: 'Correct the grammar and fix typos in the following text. Output ONLY the corrected text, no explanations or notes.\n\n{text}',
     showInContextMenu: true,
   },
   {
     id: 'default-professional-tone',
     name: 'Professional Tone',
-    template: 'Rewrite in a professional tone:\n\n{text}',
+    template: 'Rewrite the following text in a professional tone. Output ONLY the rewritten text, no explanations or notes.\n\n{text}',
     showInContextMenu: true,
   },
   {
     id: 'default-simplify',
     name: 'Simplify',
-    template: 'Rewrite this in simpler English:\n\n{text}',
+    template: 'Rewrite the following text in simpler English. Output ONLY the simplified text, no explanations or notes.\n\n{text}',
     showInContextMenu: true,
   },
 ]
