@@ -13,6 +13,7 @@ export default defineManifest({
     'contentSettings',
     'contextMenus',
     'storage',
+    'clipboardWrite',
   ],
   background: {
     service_worker: 'src/background/main.js',
