@@ -61,6 +61,14 @@ async function rebuildContextMenus() {
     title: 'Save as Note',
     contexts: ['selection'],
   })
+
+  // Add "Copy as Markdown" item
+  chrome.contextMenus.create({
+    id: 'copy-as-markdown',
+    parentId: 'ollama-scribe',
+    title: 'Copy as Markdown',
+    contexts: ['selection'],
+  })
 }
 
 async function getVariablesForPrompt(promptId) {
@@ -146,6 +154,19 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
     return
   }
+
+  // Handle copy as markdown
+  if (menuItemId === 'copy-as-markdown') {
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: copySelectionAsMarkdown,
+      })
+    } catch (err) {
+      console.error('Failed to copy as markdown:', err)
+    }
+    return
+  }
 })
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -174,3 +195,48 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
   if (windowId === chrome.windows.WINDOW_ID_NONE) return
   await sidePanelManager.isOpen()
 })
+
+function copySelectionAsMarkdown() {
+  const selection = window.getSelection()
+  if (!selection || selection.rangeCount === 0) return
+
+  const range = selection.getRangeAt(0)
+  const fragment = range.cloneContents()
+  const container = document.createElement('div')
+  container.appendChild(fragment)
+
+  function nodeToMd(node) {
+    if (node.nodeType === Node.TEXT_NODE) return node.textContent
+    if (node.nodeType !== Node.ELEMENT_NODE) return ''
+
+    const tag = node.tagName.toLowerCase()
+    const children = Array.from(node.childNodes).map(child => nodeToMd(child)).join('')
+
+    switch (tag) {
+      case 'h1': return `# ${children}\n\n`
+      case 'h2': return `## ${children}\n\n`
+      case 'h3': return `### ${children}\n\n`
+      case 'h4': return `#### ${children}\n\n`
+      case 'h5': return `##### ${children}\n\n`
+      case 'h6': return `###### ${children}\n\n`
+      case 'strong': case 'b': return `**${children}**`
+      case 'em': case 'i': return `*${children}*`
+      case 'code': return `\`${children}\``
+      case 'a': { const href = node.getAttribute('href') || ''; return `[${children}](${href})` }
+      case 'br': return '\n'
+      case 'p': return `${children}\n\n`
+      case 'blockquote': return `> ${children}\n\n`
+      case 'ul': return Array.from(node.children).map(li => `- ${nodeToMd(li)}\n`).join('')
+      case 'ol': return Array.from(node.children).map((li, i) => `${i + 1}. ${nodeToMd(li)}\n`).join('')
+      case 'li': return children
+      case 'div': return `${children}\n`
+      case 'pre': return `\`\`\`\n${children}\n\`\`\`\n\n`
+      default: return children
+    }
+  }
+
+  const markdown = nodeToMd(container).trim()
+  navigator.clipboard.writeText(markdown).catch(err => {
+    console.error('Clipboard write failed:', err)
+  })
+}
