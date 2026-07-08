@@ -1,13 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import PromptPopup from './PromptPopup.jsx'
-import { selectionToMarkdown } from '@/utils/domToMarkdown'
 import './popup.css'
 
 let popupContainer = null
 let popupRoot = null
 
-function showPopup(selectedText, markdownText, rect) {
+function showPopup(selectedText, rect) {
   hidePopup()
 
   popupContainer = document.createElement('div')
@@ -26,7 +25,6 @@ function showPopup(selectedText, markdownText, rect) {
     <StrictMode>
       <PromptPopup
         selectedText={selectedText}
-        markdownText={markdownText}
         position={{ top, left }}
         onSend={handleSend}
         onClose={hidePopup}
@@ -68,7 +66,6 @@ document.addEventListener('mouseup', (e) => {
 
   const range = selection.getRangeAt(0)
   const rect = range.getBoundingClientRect()
-  const markdownText = selectionToMarkdown()
 
-  showPopup(selectedText, markdownText, rect)
+  showPopup(selectedText, rect)
 })

@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { getPrompts } from '@/storage/prompts'
 import { getSettings } from '@/storage/settings'
 import { parseVariables } from '@/utils/templateParser'
+import { selectionToMarkdown } from '@/utils/domToMarkdown'
 
-export default function PromptPopup({ selectedText, markdownText, position, onSend, onClose }) {
+export default function PromptPopup({ selectedText, position, onSend, onClose }) {
   const [prompts, setPrompts] = useState([])
   const [selectedPrompt, setSelectedPrompt] = useState(null)
   const [variableValues, setVariableValues] = useState({})
@@ -40,7 +41,8 @@ export default function PromptPopup({ selectedText, markdownText, position, onSe
 
   async function handleCopyMarkdown() {
     try {
-      await navigator.clipboard.writeText(markdownText || selectedText)
+      const markdown = selectionToMarkdown() || selectedText
+      await navigator.clipboard.writeText(markdown)
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch (err) {
@@ -51,7 +53,8 @@ export default function PromptPopup({ selectedText, markdownText, position, onSe
   function handlePromptClick(prompt) {
     const variables = parseVariables(prompt.template)
     if (variables.length === 0) {
-      onSend(prompt.id, markdownText || selectedText, {})
+      const markdown = selectionToMarkdown() || selectedText
+      onSend(prompt.id, markdown, {})
       return
     }
     const defaults = {}
@@ -64,7 +67,8 @@ export default function PromptPopup({ selectedText, markdownText, position, onSe
   }
 
   function handleConfirm() {
-    onSend(selectedPrompt.id, markdownText || selectedText, variableValues)
+    const markdown = selectionToMarkdown() || selectedText
+    onSend(selectedPrompt.id, markdown, variableValues)
   }
 
   const variables = selectedPrompt ? parseVariables(selectedPrompt.template) : []
