@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import ChatMessage from './ChatMessage.jsx'
 import ChatInput from './ChatInput.jsx'
+import PromptBar from './PromptBar.jsx'
 import { getPrompts } from '@/storage/prompts'
-import { getDefaultProvider } from '@/storage/providers'
+import { getDefaultProvider, getProviders } from '@/storage/providers'
 import { replaceVariables } from '@/utils/templateParser'
 import { callProvider } from '@/api/client.js'
 import { onMessage, checkPending } from '@/utils/messageBus'
@@ -29,6 +30,7 @@ export default function App() {
   const messagesEndRef = useRef(null)
   const conversationRef = useRef(conversation)
   const streamingContentRef = useRef('')
+  const [activeProviderId, setActiveProviderId] = useState(null)
 
   useEffect(() => {
     conversationRef.current = conversation
@@ -73,8 +75,15 @@ export default function App() {
     await sendToAI(updated.messages)
   }
 
-  async function sendToAI(messages) {
-    const provider = await getDefaultProvider()
+  async function sendToAI(messages, providerId) {
+    let provider = null
+    if (providerId) {
+      const providers = await getProviders()
+      provider = providers.find(p => p.id === providerId)
+    }
+    if (!provider) {
+      provider = await getDefaultProvider()
+    }
     if (!provider) {
       const current = conversationRef.current
       const errorMsg = { id: crypto.randomUUID(), role: 'assistant', content: 'Error: No provider configured. Please add a provider in the options page.' }
@@ -139,6 +148,24 @@ export default function App() {
     await sendToAI(updated.messages)
   }
 
+  async function handlePromptSend(promptId, variables, providerId) {
+    setActiveProviderId(providerId || null)
+    const prompts = (await getPrompts()) || []
+    const prompt = prompts.find(p => p.id === promptId)
+    if (!prompt) return
+
+    const content = replaceVariables(prompt.template, '', variables)
+    const current = conversationRef.current
+    const newMessage = { id: crypto.randomUUID(), role: 'user', content }
+    const updated = {
+      ...current,
+      messages: [...(current?.messages || []), newMessage],
+    }
+    setConversation(updated)
+    await saveConversation(updated)
+    await sendToAI(updated.messages, providerId)
+  }
+
   function handleStop() {
     abortRef.current?.abort()
   }
@@ -181,6 +208,7 @@ export default function App() {
         )}
         <div ref={messagesEndRef} />
       </div>
+      <PromptBar onSend={handlePromptSend} disabled={isStreaming} />
       <ChatInput onSend={handleSend} disabled={isStreaming} />
     </>
   )
