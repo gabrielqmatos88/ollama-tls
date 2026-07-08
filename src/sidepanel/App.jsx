@@ -7,6 +7,7 @@ import { getDefaultProvider, getProviders } from '@/storage/providers'
 import { replaceVariables } from '@/utils/templateParser'
 import { callProvider } from '@/api/client.js'
 import { onMessage, checkPending } from '@/utils/messageBus'
+import NotesTab from './NotesTab.jsx'
 import './App.css'
 
 const CONVERSATIONS_KEY = 'conversations'
@@ -31,6 +32,7 @@ export default function App() {
   const conversationRef = useRef(conversation)
   const streamingContentRef = useRef('')
   const [activeProviderId, setActiveProviderId] = useState(null)
+  const [activeTab, setActiveTab] = useState('chat')
 
   useEffect(() => {
     conversationRef.current = conversation
@@ -185,31 +187,50 @@ export default function App() {
   return (
     <>
       <div className="chat-header">
-        <h2>Ollama Scribe</h2>
+        <div className="tab-switcher">
+          <button
+            className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
+            onClick={() => setActiveTab('chat')}
+          >
+            Chat
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'notes' ? 'active' : ''}`}
+            onClick={() => setActiveTab('notes')}
+          >
+            Notes
+          </button>
+        </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {isStreaming && <button className="stop-btn" onClick={handleStop}>Stop</button>}
-          <button className="btn btn-secondary" onClick={handleNewConversation} style={{ padding: '4px 12px', fontSize: 13 }}>New</button>
+          {activeTab === 'chat' && isStreaming && <button className="stop-btn" onClick={handleStop}>Stop</button>}
+          {activeTab === 'chat' && <button className="btn btn-secondary" onClick={handleNewConversation} style={{ padding: '4px 12px', fontSize: 13 }}>New</button>}
         </div>
       </div>
-      <div className="chat-messages">
-        {messages.length === 0 && !isStreaming && (
-          <div className="empty-state">Select text on a page and choose a prompt to get started.</div>
-        )}
-        {messages.map((msg, i) => (
-          <ChatMessage key={msg.id || i} message={msg} onCopy={handleCopy} />
-        ))}
-        {isStreaming && streamingContent && (
-          <div className="chat-message assistant">
-            <div className="message-content">
-              <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0 }}>{streamingContent}</pre>
-            </div>
-            <span className="streaming-indicator" />
+      {activeTab === 'chat' ? (
+        <>
+          <div className="chat-messages">
+            {messages.length === 0 && !isStreaming && (
+              <div className="empty-state">Select text on a page and choose a prompt to get started.</div>
+            )}
+            {messages.map((msg, i) => (
+              <ChatMessage key={msg.id || i} message={msg} onCopy={handleCopy} />
+            ))}
+            {isStreaming && streamingContent && (
+              <div className="chat-message assistant">
+                <div className="message-content">
+                  <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0 }}>{streamingContent}</pre>
+                </div>
+                <span className="streaming-indicator" />
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-      <PromptBar onSend={handlePromptSend} disabled={isStreaming} />
-      <ChatInput onSend={handleSend} disabled={isStreaming} />
+          <PromptBar onSend={handlePromptSend} disabled={isStreaming} />
+          <ChatInput onSend={handleSend} disabled={isStreaming} />
+        </>
+      ) : (
+        <NotesTab />
+      )}
     </>
   )
 }
