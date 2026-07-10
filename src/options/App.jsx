@@ -1,22 +1,40 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProvidersTab from './ProvidersTab.jsx'
 import PromptsTab from './PromptsTab.jsx'
 import SettingsTab from './SettingsTab.jsx'
+import OllamaInstancesTab from './OllamaInstancesTab.jsx'
+import { getDefaultProvider } from '@/storage/providers'
 
-const TABS = [
-  { id: 'providers', label: 'Providers' },
-  { id: 'prompts', label: 'Prompts' },
-  { id: 'settings', label: 'Settings' },
-]
+function isLocalhostProvider(provider) {
+  if (!provider?.baseUrl) return false
+  return provider.baseUrl.includes('localhost') || provider.baseUrl.includes('127.0.0.1')
+}
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('providers')
+  const [showOllamaTab, setShowOllamaTab] = useState(false)
+
+  useEffect(() => {
+    checkOllamaAvailability()
+  }, [])
+
+  async function checkOllamaAvailability() {
+    const provider = await getDefaultProvider()
+    setShowOllamaTab(isLocalhostProvider(provider))
+  }
+
+  const tabs = [
+    { id: 'providers', label: 'Providers' },
+    { id: 'prompts', label: 'Prompts' },
+    { id: 'settings', label: 'Settings' },
+    ...(showOllamaTab ? [{ id: 'ollama', label: 'Ollama' }] : []),
+  ]
 
   return (
     <div className="options-container">
       <h1>Ollama Scribe</h1>
       <nav className="tabs">
-        {TABS.map(tab => (
+        {tabs.map(tab => (
           <button
             key={tab.id}
             className={`tab ${activeTab === tab.id ? 'active' : ''}`}
@@ -30,6 +48,7 @@ export default function App() {
         {activeTab === 'providers' && <ProvidersTab />}
         {activeTab === 'prompts' && <PromptsTab />}
         {activeTab === 'settings' && <SettingsTab />}
+        {activeTab === 'ollama' && <OllamaInstancesTab />}
       </main>
     </div>
   )
