@@ -127,6 +127,7 @@ async function handleTextareaCompose(promptId, variables) {
       model: provider.model,
       messages: [{ role: 'user', content }],
       signal: AbortSignal.timeout(60000), // 60 second timeout
+      keepAlive: provider?.keepAlive,
       onChunk: () => {},
     })
 
