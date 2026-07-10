@@ -15,7 +15,9 @@ export default function SettingsTab() {
   }
 
   async function handleSave() {
-    await updateSettings({ nativeLanguage: settings.nativeLanguage || null })
+    await updateSettings({
+      nativeLanguage: settings.nativeLanguage || null,
+    })
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
