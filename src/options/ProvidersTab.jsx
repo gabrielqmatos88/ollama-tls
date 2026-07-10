@@ -6,6 +6,7 @@ const EMPTY_PROVIDER = {
   baseUrl: '',
   apiKey: '',
   model: '',
+  keepAlive: '-1',
   isDefault: false,
 }
 
@@ -192,6 +193,17 @@ export default function ProvidersTab() {
                 </button>
               </div>
               {modelError && <span style={{ fontSize: 13, color: '#dc2626' }}>{modelError}</span>}
+            </label>
+            <label>
+              Keep Alive
+              <input
+                value={form.keepAlive || '-1'}
+                onChange={e => setForm({ ...form, keepAlive: e.target.value })}
+                placeholder="-1"
+              />
+              <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>
+                How long to keep model loaded. "-1" (permanent), "0" (unload immediately), duration ("10m", "24h").
+              </div>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <input
