@@ -10,7 +10,7 @@
  * @param {Function} params.onChunk - called with each content delta
  * @returns {Promise<string>} full response text
  */
-export async function callProvider({ baseUrl, apiKey, model, messages, signal, onChunk }) {
+export async function callProvider({ baseUrl, apiKey, model, messages, signal, onChunk, keepAlive }) {
   const url = `${baseUrl.replace(/\/+$/, '')}/chat/completions`
 
   const headers = {
@@ -20,14 +20,19 @@ export async function callProvider({ baseUrl, apiKey, model, messages, signal, o
     headers['Authorization'] = `Bearer ${apiKey}`
   }
 
+  const payload = {
+    model,
+    messages,
+    stream: true,
+  }
+  if (keepAlive !== undefined && keepAlive !== null && keepAlive !== '') {
+    payload.keep_alive = keepAlive
+  }
+
   const response = await fetch(url, {
     method: 'POST',
     headers,
-    body: JSON.stringify({
-      model,
-      messages,
-      stream: true,
-    }),
+    body: JSON.stringify(payload),
     signal,
   })
 
