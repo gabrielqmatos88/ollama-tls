@@ -44,6 +44,21 @@ export default function ProvidersTab() {
     setModelError(null)
   }
 
+  function startDuplicate(provider) {
+    const baseName = provider.name.replace(/\s*\(copy( \d+)?\)$/, '')
+    const existingNames = new Set(providers.map(p => p.name))
+    let name = `${baseName} (copy)`
+    let i = 2
+    while (existingNames.has(name)) {
+      name = `${baseName} (copy ${i++})`
+    }
+    setForm({ ...provider, id: undefined, name, model: '', isDefault: false, builtIn: false })
+    setEditing('new')
+    setTestResult(null)
+    setModelList(null)
+    setModelError(null)
+  }
+
   function cancelEdit() {
     setEditing(null)
     setForm(EMPTY_PROVIDER)
@@ -237,10 +252,12 @@ export default function ProvidersTab() {
             <div style={{ flex: 1 }}>
               <strong>{provider.name}</strong>
               {provider.isDefault && <span style={{ marginLeft: 8, fontSize: 12, color: '#2563eb', background: '#eff6ff', padding: '2px 6px', borderRadius: 4 }}>default</span>}
-              <div style={{ fontSize: 13, color: '#666' }}>{provider.baseUrl} — {provider.model}</div>
+              {provider.builtIn && <span style={{ marginLeft: 8, fontSize: 12, color: '#65a30d', background: '#f0fdf4', padding: '2px 6px', borderRadius: 4 }}>built-in</span>}
+              <div style={{ fontSize: 13, color: '#666' }}>{provider.baseUrl} — {provider.model || '(no model selected)'}</div>
             </div>
             <button className="btn btn-secondary" onClick={() => startEdit(provider)}>Edit</button>
-            <button className="btn btn-danger" onClick={() => handleDelete(provider.id)}>Delete</button>
+            <button className="btn btn-secondary" onClick={() => startDuplicate(provider)}>Duplicate</button>
+            {!provider.builtIn && <button className="btn btn-danger" onClick={() => handleDelete(provider.id)}>Delete</button>}
           </div>
         ))}
         {providers.length === 0 && !editing && (

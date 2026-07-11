@@ -205,6 +205,7 @@ export default function App() {
         <div style={{ display: 'flex', gap: 8 }}>
           {activeTab === 'chat' && isStreaming && <button className="stop-btn" onClick={handleStop}>Stop</button>}
           {activeTab === 'chat' && <button className="btn btn-secondary" onClick={handleNewConversation} style={{ padding: '4px 12px', fontSize: 13 }}>New</button>}
+          <button className="btn btn-secondary" onClick={() => chrome.runtime.openOptionsPage()} style={{ padding: '4px 12px', fontSize: 13 }}>⚙️</button>
         </div>
       </div>
       {activeTab === 'chat' ? (

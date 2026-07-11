@@ -1,12 +1,29 @@
 const STORAGE_KEY = 'providers'
 
+const BUILT_IN_PROVIDERS = [
+  {
+    id: 'ollama-local',
+    name: 'Ollama (Local)',
+    baseUrl: 'http://localhost:11434/v1',
+    apiKey: '',
+    model: '',
+    keepAlive: '-1',
+    isDefault: true,
+    builtIn: true,
+  },
+]
+
 export async function getProviders() {
   const result = await chrome.storage.sync.get(STORAGE_KEY)
-  return result[STORAGE_KEY] || []
+  const stored = result[STORAGE_KEY] || []
+  const storedIds = new Set(stored.map(p => p.id))
+  const merged = [...BUILT_IN_PROVIDERS.filter(p => !storedIds.has(p.id)), ...stored]
+  return merged
 }
 
 export async function saveProviders(providers) {
-  await chrome.storage.sync.set({ [STORAGE_KEY]: providers })
+  const userProviders = providers.filter(p => !p.builtIn)
+  await chrome.storage.sync.set({ [STORAGE_KEY]: userProviders })
 }
 
 export async function addProvider(provider) {
@@ -28,6 +45,8 @@ export async function updateProvider(id, updates) {
 
 export async function deleteProvider(id) {
   const providers = await getProviders()
+  const provider = providers.find(p => p.id === id)
+  if (provider?.builtIn) throw new Error('Cannot delete a built-in provider')
   await saveProviders(providers.filter(p => p.id !== id))
 }
 
