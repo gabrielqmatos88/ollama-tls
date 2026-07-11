@@ -70,8 +70,9 @@ export default function ProvidersTab() {
   async function handleSave() {
     if (!form.name || !form.baseUrl || !form.model) return
 
-    if (editing === 'new') {
-      await addProvider(form)
+    if (editing === 'new' || form.builtIn) {
+      const { builtIn, id, ...rest } = form
+      await addProvider(rest)
     } else {
       await updateProvider(editing, form)
     }

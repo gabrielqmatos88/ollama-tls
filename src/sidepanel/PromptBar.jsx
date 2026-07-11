@@ -1,29 +1,22 @@
 import { useState, useEffect } from 'react'
 import { getPrompts } from '@/storage/prompts'
-import { getProviders } from '@/storage/providers'
 import { getSettings } from '@/storage/settings'
 import { parseVariables } from '@/utils/templateParser'
 
-export default function PromptBar({ onSend, disabled }) {
+export default function PromptBar({ onSend, disabled, providers, selectedProviderId, onProviderChange }) {
   const [prompts, setPrompts] = useState([])
-  const [providers, setProviders] = useState([])
   const [selectedPromptId, setSelectedPromptId] = useState('')
-  const [selectedProviderId, setSelectedProviderId] = useState('')
   const [variableValues, setVariableValues] = useState({})
   const [lastRunVariables, setLastRunVariables] = useState({})
   const [settings, setSettings] = useState({})
 
   useEffect(() => {
     async function load() {
-      const [allPrompts, allProviders, s] = await Promise.all([
+      const [allPrompts, s] = await Promise.all([
         getPrompts(),
-        getProviders(),
         getSettings(),
       ])
       setPrompts(allPrompts.filter(p => p.showInContextMenu))
-      setProviders(allProviders)
-      const defaultProvider = allProviders.find(p => p.isDefault) || allProviders[0]
-      if (defaultProvider) setSelectedProviderId(defaultProvider.id)
       setSettings(s)
     }
     load()
@@ -76,7 +69,7 @@ export default function PromptBar({ onSend, disabled }) {
         {providers.length > 1 && (
           <select
             value={selectedProviderId}
-            onChange={e => setSelectedProviderId(e.target.value)}
+            onChange={e => onProviderChange(e.target.value)}
             disabled={disabled}
           >
             {providers.map(p => (

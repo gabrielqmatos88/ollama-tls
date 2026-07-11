@@ -33,6 +33,7 @@ export default function App() {
   const streamingContentRef = useRef('')
   const [activeProviderId, setActiveProviderId] = useState(null)
   const [activeTab, setActiveTab] = useState('chat')
+  const [providers, setProviders] = useState([])
 
   useEffect(() => {
     conversationRef.current = conversation
@@ -40,6 +41,11 @@ export default function App() {
 
   useEffect(() => {
     loadConversation().then(setConversation)
+    getProviders().then(allProviders => {
+      setProviders(allProviders)
+      const defaultProv = allProviders.find(p => p.isDefault) || allProviders[0]
+      if (defaultProv) setActiveProviderId(defaultProv.id)
+    })
 
     // Subscribe to MessageBus
     const unsubscribe = onMessage((message) => {
@@ -148,7 +154,7 @@ export default function App() {
     }
     setConversation(updated)
     await saveConversation(updated)
-    await sendToAI(updated.messages)
+    await sendToAI(updated.messages, activeProviderId)
   }
 
   async function handlePromptSend(promptId, variables, providerId) {
@@ -227,7 +233,7 @@ export default function App() {
             )}
             <div ref={messagesEndRef} />
           </div>
-          <PromptBar onSend={handlePromptSend} disabled={isStreaming} />
+          <PromptBar onSend={handlePromptSend} disabled={isStreaming} providers={providers} selectedProviderId={activeProviderId} onProviderChange={setActiveProviderId} />
           <ChatInput onSend={handleSend} disabled={isStreaming} />
         </>
       ) : (

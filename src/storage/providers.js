@@ -6,7 +6,7 @@ const BUILT_IN_PROVIDERS = [
     name: 'Ollama (Local)',
     baseUrl: 'http://localhost:11434/v1',
     apiKey: '',
-    model: '',
+    model: 'llama3.2',
     keepAlive: '-1',
     isDefault: true,
     builtIn: true,
@@ -29,6 +29,9 @@ export async function saveProviders(providers) {
 export async function addProvider(provider) {
   const providers = await getProviders()
   provider.id = crypto.randomUUID()
+  if (provider.isDefault) {
+    providers.forEach(p => { p.isDefault = false })
+  }
   providers.push(provider)
   await saveProviders(providers)
   return provider
