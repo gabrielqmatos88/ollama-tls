@@ -28,7 +28,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: white;
+  background: var(--paper);
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -57,7 +57,7 @@ body {
 }
 
 .tab-btn.active {
-  background: white;
+  background: var(--paper);
   color: #2563eb;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
@@ -88,7 +88,7 @@ body {
 
 .chat-message.assistant {
   align-self: flex-start;
-  background: white;
+  background: var(--paper);
   border: 1px solid #e5e7eb;
   border-bottom-left-radius: 4px;
 }
@@ -98,7 +98,7 @@ body {
   padding: 4px 10px;
   border: 1px solid #d1d5db;
   border-radius: 4px;
-  background: white;
+  background: var(--paper);
   cursor: pointer;
   font-size: 12px;
   color: #555;
@@ -112,7 +112,7 @@ body {
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-  background: white;
+  background: var(--paper);
   border-top: 1px solid #e5e7eb;
 }
 
@@ -156,7 +156,7 @@ body {
   padding: 4px 12px;
   border: 1px solid #dc2626;
   border-radius: 4px;
-  background: white;
+  background: var(--paper);
   color: #dc2626;
   cursor: pointer;
   font-size: 13px;
@@ -191,7 +191,7 @@ body {
 }
 
 .prompt-bar {
-  background: white;
+  background: var(--paper);
   border-bottom: 1px solid #e5e7eb;
   padding: 8px 16px;
 }
@@ -207,7 +207,7 @@ body {
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 13px;
-  background: white;
+  background: var(--paper);
 }
 
 .prompt-bar-row select:focus {
@@ -304,7 +304,7 @@ body {
   padding: 10px 12px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  background: white;
+  background: var(--paper);
 }
 
 .note-item.selected {
@@ -369,7 +369,7 @@ body {
 
 .notes-actions {
   padding: 12px 16px;
-  background: white;
+  background: var(--paper);
   border-top: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
@@ -416,7 +416,7 @@ body {
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-  background: white;
+  background: var(--paper);
   border-top: 1px solid #e5e7eb;
 }
 
@@ -424,7 +424,7 @@ body {
   padding: 4px 12px;
   border: 1px solid #dc2626;
   border-radius: 6px;
-  background: white;
+  background: var(--paper);
   color: #dc2626;
   cursor: pointer;
   font-size: 13px;
@@ -487,6 +487,48 @@ body {
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-  background: white;
+  background: var(--paper);
   border-top: 1px solid #e5e7eb;
+}
+
+/* ─── Dark Theme (VSCode-like) ─── */
+[data-theme="dark"] {
+  --ink: #e4e4e7;
+  --ink-soft: #d4d4d8;
+  --ink-muted: #a1a1aa;
+  --paper: #1e1e1e;
+  --paper-warm: #252526;
+  --paper-deep: #2d2d30;
+  --accent: #4fc1ff;
+  --accent-hover: #2ba4e0;
+  --accent-light: #1e3a4d;
+  --accent-soft: #1e3a4d;
+  --sage: #4ec9b0;
+  --rose: #f48771;
+  --rose-light: #3d1f1f;
+  --border: #3e3e42;
+  --border-fine: #2d2d30;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ─── Monokai Theme ─── */
+[data-theme="monokai"] {
+  --ink: #f8f8f2;
+  --ink-soft: #cfcfc2;
+  --ink-muted: #75715e;
+  --paper: #272822;
+  --paper-warm: #2d2e27;
+  --paper-deep: #3e3d32;
+  --accent: #a6e22e;
+  --accent-hover: #8bc220;
+  --accent-light: #2a3a1a;
+  --accent-soft: #2a3a1a;
+  --sage: #a6e22e;
+  --rose: #f92672;
+  --rose-light: #3d1525;
+  --border: #49483e;
+  --border-fine: #3e3d32;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
