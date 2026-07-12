@@ -7,6 +7,7 @@ import { getDefaultProvider, getProviders } from '@/storage/providers'
 import { replaceVariables } from '@/utils/templateParser'
 import { callProvider } from '@/api/client.js'
 import { onMessage, checkPending } from '@/utils/messageBus'
+import { onThemeChanged } from '@/utils/theme'
 import NotesTab from './NotesTab.jsx'
 import './App.css'
 
@@ -57,7 +58,27 @@ export default function App() {
     // Check for any pending messages
     checkPending()
 
-    return unsubscribe
+    // Listen for theme changes
+    const unsubscribeTheme = onThemeChanged()
+
+    // Listen for provider changes from options page
+    const providerListener = (changes, area) => {
+      if (area === 'sync' && changes.providers) {
+        getProviders().then(allProviders => {
+          setProviders(allProviders)
+          setActiveProviderId(prev =>
+            allProviders.some(p => p.id === prev) ? prev : (allProviders.find(p => p.isDefault) || allProviders[0])?.id
+          )
+        })
+      }
+    }
+    chrome.storage.onChanged.addListener(providerListener)
+
+    return () => {
+      unsubscribe()
+      unsubscribeTheme()
+      chrome.storage.onChanged.removeListener(providerListener)
+    }
   }, [])
 
   useEffect(() => {
