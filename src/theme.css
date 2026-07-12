@@ -1,0 +1,41 @@
+/* ─── Dark Theme (VSCode-like) ─── */
+[data-theme="dark"] {
+  --ink: #e4e4e7;
+  --ink-soft: #d4d4d8;
+  --ink-muted: #a1a1aa;
+  --paper: #1e1e1e;
+  --paper-warm: #252526;
+  --paper-deep: #2d2d30;
+  --accent: #4fc1ff;
+  --accent-hover: #2ba4e0;
+  --accent-light: #1e3a4d;
+  --accent-soft: #1e3a4d;
+  --sage: #4ec9b0;
+  --rose: #f48771;
+  --rose-light: #3d1f1f;
+  --border: #3e3e42;
+  --border-fine: #2d2d30;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ─── Monokai Theme ─── */
+[data-theme="monokai"] {
+  --ink: #f8f8f2;
+  --ink-soft: #cfcfc2;
+  --ink-muted: #75715e;
+  --paper: #272822;
+  --paper-warm: #2d2e27;
+  --paper-deep: #3e3d32;
+  --accent: #a6e22e;
+  --accent-hover: #8bc220;
+  --accent-light: #2a3a1a;
+  --accent-soft: #2a3a1a;
+  --sage: #a6e22e;
+  --rose: #f92672;
+  --rose-light: #3d1525;
+  --border: #49483e;
+  --border-fine: #3e3d32;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+}

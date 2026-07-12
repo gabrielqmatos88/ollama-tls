@@ -6,8 +6,8 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f9fafb;
-  color: #333;
+  background: var(--paper-warm);
+  color: var(--ink);
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -29,13 +29,13 @@ body {
   align-items: center;
   padding: 12px 16px;
   background: var(--paper);
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .tab-switcher {
   display: flex;
   gap: 4px;
-  background: #f3f4f6;
+  background: var(--paper-deep);
   border-radius: 8px;
   padding: 3px;
 }
@@ -89,7 +89,7 @@ body {
 .chat-message.assistant {
   align-self: flex-start;
   background: var(--paper);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-bottom-left-radius: 4px;
 }
 
@@ -105,7 +105,7 @@ body {
 }
 
 .copy-btn:hover {
-  background: #f3f4f6;
+  background: var(--paper-deep);
 }
 
 .chat-input {
@@ -113,7 +113,7 @@ body {
   gap: 8px;
   padding: 12px 16px;
   background: var(--paper);
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .chat-input textarea {
@@ -192,7 +192,7 @@ body {
 
 .prompt-bar {
   background: var(--paper);
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   padding: 8px 16px;
 }
 
@@ -302,7 +302,7 @@ body {
 
 .note-item {
   padding: 10px 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--paper);
 }
@@ -370,7 +370,7 @@ body {
 .notes-actions {
   padding: 12px 16px;
   background: var(--paper);
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -417,7 +417,7 @@ body {
   gap: 8px;
   padding: 12px 16px;
   background: var(--paper);
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .btn-danger {
@@ -488,47 +488,5 @@ body {
   gap: 8px;
   padding: 12px 16px;
   background: var(--paper);
-  border-top: 1px solid #e5e7eb;
-}
-
-/* ─── Dark Theme (VSCode-like) ─── */
-[data-theme="dark"] {
-  --ink: #e4e4e7;
-  --ink-soft: #d4d4d8;
-  --ink-muted: #a1a1aa;
-  --paper: #1e1e1e;
-  --paper-warm: #252526;
-  --paper-deep: #2d2d30;
-  --accent: #4fc1ff;
-  --accent-hover: #2ba4e0;
-  --accent-light: #1e3a4d;
-  --accent-soft: #1e3a4d;
-  --sage: #4ec9b0;
-  --rose: #f48771;
-  --rose-light: #3d1f1f;
-  --border: #3e3e42;
-  --border-fine: #2d2d30;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-
-/* ─── Monokai Theme ─── */
-[data-theme="monokai"] {
-  --ink: #f8f8f2;
-  --ink-soft: #cfcfc2;
-  --ink-muted: #75715e;
-  --paper: #272822;
-  --paper-warm: #2d2e27;
-  --paper-deep: #3e3d32;
-  --accent: #a6e22e;
-  --accent-hover: #8bc220;
-  --accent-light: #2a3a1a;
-  --accent-soft: #2a3a1a;
-  --sage: #a6e22e;
-  --rose: #f92672;
-  --rose-light: #3d1525;
-  --border: #49483e;
-  --border-fine: #3e3d32;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+  border-top: 1px solid var(--border);
 }
