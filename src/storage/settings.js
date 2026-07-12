@@ -5,6 +5,7 @@ export async function getSettings() {
   return result[STORAGE_KEY] || {
     nativeLanguage: null,
     defaultProviderId: null,
+    theme: 'light',
   }
 }
 
