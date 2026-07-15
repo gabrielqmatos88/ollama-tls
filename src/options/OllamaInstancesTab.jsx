@@ -76,7 +76,7 @@ export default function OllamaInstancesTab() {
     return (
       <div>
         <h2 style={{ marginBottom: 16 }}>Ollama Instances</h2>
-        <p style={{ color: "#666" }}>Loading...</p>
+        <p className="form-hint">Loading...</p>
       </div>
     );
   }
@@ -85,7 +85,7 @@ export default function OllamaInstancesTab() {
     return (
       <div>
         <h2 style={{ marginBottom: 16 }}>Ollama Instances</h2>
-        <p style={{ color: "#dc2626" }}>{error}</p>
+        <p className="error-text">{error}</p>
         <button
           className="btn btn-secondary"
           onClick={loadModels}
@@ -99,14 +99,7 @@ export default function OllamaInstancesTab() {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
+      <div className="section-header">
         <h2>Ollama Instances</h2>
         <button className="btn btn-secondary" onClick={loadModels}>
           Refresh
@@ -114,26 +107,19 @@ export default function OllamaInstancesTab() {
       </div>
 
       {models.length === 0 ? (
-        <p style={{ color: "#666", textAlign: "center", padding: 24 }}>
+        <p className="empty-text">
           No models currently loaded in Ollama.
         </p>
       ) : (
-        <div style={{ display: "grid", gap: 8 }}>
+        <div className="items-list">
           {models.map((model) => (
             <div
               key={model.name}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                padding: 12,
-                border: "1px solid #e5e7eb",
-                borderRadius: 8,
-                gap: 12,
-              }}
+              className="item-card"
             >
-              <div style={{ flex: 1 }}>
+              <div className="flex-1">
                 <strong>{model.name}</strong>
-                <div style={{ fontSize: 13, color: "#666" }}>
+                <div className="form-hint">
                   Size: {formatSize(model.size)}
                   {model.details?.parameter_size &&
                     ` · ${model.details.parameter_size}`}
