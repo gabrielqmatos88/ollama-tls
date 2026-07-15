@@ -1,18 +1,24 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { getSettings } from "@/storage/settings";
 import PromptPopup from "./PromptPopup.jsx";
+import "@/theme.css";
 import "./popup.css";
 
 let popupContainer = null;
 let popupRoot = null;
 
-function showPopup(selectedText, rect) {
+async function showPopup(selectedText, rect) {
   hidePopup();
 
   popupContainer = document.createElement("div");
   popupContainer.id = "crjsx-prompt-popup-root";
   popupContainer.style.position = "absolute";
   popupContainer.style.zIndex = "2147483647";
+
+  const settings = await getSettings();
+  popupContainer.dataset.theme = settings.theme || "light";
+
   document.body.appendChild(popupContainer);
 
   const scrollX = window.scrollX;
@@ -45,7 +51,6 @@ function hidePopup() {
 }
 
 async function handleSend(promptId, selectedText, variables) {
-  // Send message to background to open side panel and forward
   chrome.runtime.sendMessage({
     type: "OPEN_SIDEBAR_WITH_PROMPT",
     promptId,

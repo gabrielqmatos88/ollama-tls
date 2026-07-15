@@ -4,8 +4,10 @@ import { getPrompts } from "@/storage/prompts";
 import { replaceVariables } from "@/utils/templateParser";
 import { callProvider } from "@/api/client.js";
 import { getDefaultProvider } from "@/storage/providers";
+import { getSettings } from "@/storage/settings";
 import Spinner from "./Spinner.jsx";
 import DiffPopup from "./DiffPopup.jsx";
+import "@/theme.css";
 import "./spinner.css";
 import "./diffPopup.css";
 
@@ -13,23 +15,27 @@ let overlayContainer = null;
 let overlayRoot = null;
 let activeTextarea = null;
 
+async function applyThemeToContainer(container) {
+  const settings = await getSettings();
+  container.dataset.theme = settings.theme || "light";
+}
+
 function showSpinner(textarea) {
   hideSpinner();
   activeTextarea = textarea;
 
-  // Create overlay positioned relative to textarea
   overlayContainer = document.createElement("div");
   overlayContainer.id = "crjsx-spinner-overlay";
   overlayContainer.style.position = "absolute";
   overlayContainer.style.zIndex = "2147483646";
 
-  // Position over the textarea
   const rect = textarea.getBoundingClientRect();
   overlayContainer.style.top = `${rect.top + window.scrollY}px`;
   overlayContainer.style.left = `${rect.left + window.scrollX}px`;
   overlayContainer.style.width = `${rect.width}px`;
   overlayContainer.style.height = `${rect.height}px`;
 
+  applyThemeToContainer(overlayContainer);
   document.body.appendChild(overlayContainer);
 
   overlayRoot = createRoot(overlayContainer);
@@ -56,6 +62,8 @@ function showDiffPopup(textarea, original, suggested) {
 
   const popupContainer = document.createElement("div");
   popupContainer.id = "crjsx-diff-popup-root";
+
+  applyThemeToContainer(popupContainer);
   document.body.appendChild(popupContainer);
 
   const popupRoot = createRoot(popupContainer);
@@ -103,18 +111,14 @@ async function handleTextareaCompose(promptId, variables) {
 
   const originalText = textarea.value || textarea.textContent || "";
 
-  // Get prompt template
   const prompts = (await getPrompts()) || [];
   const prompt = prompts.find((p) => p.id === promptId);
   if (!prompt) return;
 
-  // Build the message with textarea content
   const content = replaceVariables(prompt.template, originalText, variables);
 
-  // Show spinner
   showSpinner(textarea);
 
-  // Get provider
   const provider = await getDefaultProvider();
   if (!provider) {
     hideSpinner();
@@ -123,18 +127,16 @@ async function handleTextareaCompose(promptId, variables) {
   }
 
   try {
-    // Call LLM
     const result = await callProvider({
       baseUrl: provider.baseUrl,
       apiKey: provider.apiKey,
       model: provider.model,
       messages: [{ role: "user", content }],
-      signal: AbortSignal.timeout(60000), // 60 second timeout
+      signal: AbortSignal.timeout(60000),
       keepAlive: provider?.keepAlive,
       onChunk: () => {},
     });
 
-    // Show diff popup
     showDiffPopup(textarea, originalText, result);
   } catch (err) {
     hideSpinner();
@@ -142,7 +144,6 @@ async function handleTextareaCompose(promptId, variables) {
   }
 }
 
-// Listen for messages from background
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "TEXTAREA_COMPOSE") {
     handleTextareaCompose(message.promptId, message.variables);
@@ -151,14 +152,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-// Track which textarea was last focused
 document.addEventListener("focusin", (e) => {
   if (e.target.tagName === "TEXTAREA" || e.target.isContentEditable) {
     activeTextarea = e.target;
   }
 });
 
-// Also check storage on load
 chrome.storage.local.get("textareaCompose").then((result) => {
   if (result.textareaCompose) {
     const { promptId, variables } = result.textareaCompose;
