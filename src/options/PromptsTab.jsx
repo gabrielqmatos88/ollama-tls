@@ -66,14 +66,7 @@ export default function PromptsTab() {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
+      <div className="section-header">
         <h2>Prompts</h2>
         <button className="btn btn-primary" onClick={startAdd}>
           Add Prompt
@@ -81,19 +74,11 @@ export default function PromptsTab() {
       </div>
 
       {editing && (
-        <div
-          style={{
-            background: "#f9fafb",
-            padding: 16,
-            borderRadius: 8,
-            marginBottom: 16,
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <h3 style={{ marginBottom: 12 }}>
+        <div className="form-card">
+          <h3>
             {editing === "new" ? "New Prompt" : "Edit Prompt"}
           </h3>
-          <div style={{ display: "grid", gap: 12 }}>
+          <div className="form-grid">
             <label>
               Name
               <input
@@ -112,14 +97,14 @@ export default function PromptsTab() {
               />
             </label>
             {detectedVariables.length > 0 && (
-              <div style={{ fontSize: 13, color: "#666" }}>
+              <div className="form-hint">
                 <strong>Variables detected:</strong>
                 <ul style={{ marginTop: 4, paddingLeft: 20 }}>
                   {detectedVariables.map((v) => (
                     <li key={v.name}>
                       <code>{`{${v.name}}`}</code>
                       {" — "}
-                      <span style={{ color: "#2563eb" }}>{v.type}</span>
+                      <span style={{ color: "var(--accent)" }}>{v.type}</span>
                       {v.options && ` (options: ${v.options.join(", ")})`}
                     </li>
                   ))}
@@ -133,12 +118,12 @@ export default function PromptsTab() {
                 onChange={(e) =>
                   setForm({ ...form, showInContextMenu: e.target.checked })
                 }
-                style={{ width: "auto" }}
+                className="input-auto"
               />
               Show in context menu
             </label>
           </div>
-          <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+          <div className="form-actions">
             <button className="btn btn-primary" onClick={handleSave}>
               Save
             </button>
@@ -149,40 +134,24 @@ export default function PromptsTab() {
         </div>
       )}
 
-      <div style={{ display: "grid", gap: 8 }}>
+      <div className="items-list">
         {prompts.map((prompt) => (
           <div
             key={prompt.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: 12,
-              border: "1px solid #e5e7eb",
-              borderRadius: 8,
-              gap: 12,
-            }}
+            className="item-card"
           >
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <strong>{prompt.name}</strong>
               {!prompt.showInContextMenu && (
                 <span
-                  style={{
-                    marginLeft: 8,
-                    fontSize: 12,
-                    color: "#666",
-                    background: "#f3f4f6",
-                    padding: "2px 6px",
-                    borderRadius: 4,
-                  }}
+                  className="badge badge--gray"
                 >
                   hidden
                 </span>
               )}
               <div
+                className="form-hint"
                 style={{
-                  fontSize: 13,
-                  color: "#666",
-                  marginTop: 4,
                   whiteSpace: "pre-wrap",
                   maxHeight: 40,
                   overflow: "hidden",
@@ -206,7 +175,7 @@ export default function PromptsTab() {
           </div>
         ))}
         {prompts.length === 0 && !editing && (
-          <p style={{ color: "#666", textAlign: "center", padding: 24 }}>
+          <p className="empty-text">
             No prompts configured.
           </p>
         )}
