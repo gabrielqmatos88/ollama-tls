@@ -1,17 +1,17 @@
 .crjsx-prompt-popup {
   position: absolute;
   z-index: 2147483647;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--paper);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
   padding: 8px;
   min-width: 200px;
   max-width: 320px;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
-  color: #333;
+  color: var(--ink);
 }
 
 .crjsx-prompt-popup .prompt-list {
@@ -28,11 +28,11 @@
   text-align: left;
   border-radius: 6px;
   font-size: 14px;
-  color: #333;
+  color: var(--ink);
 }
 
 .crjsx-prompt-popup .prompt-item:hover {
-  background: #f3f4f6;
+  background: var(--paper-deep);
 }
 
 .crjsx-prompt-popup .variables-form {
@@ -47,14 +47,14 @@
   flex-direction: column;
   gap: 4px;
   font-size: 13px;
-  color: #555;
+  color: var(--ink-soft);
 }
 
 .crjsx-prompt-popup .variables-form input,
 .crjsx-prompt-popup .variables-form textarea,
 .crjsx-prompt-popup .variables-form select {
   padding: 6px 8px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-fine);
   border-radius: 4px;
   font-size: 13px;
 }
@@ -86,24 +86,24 @@
   padding: 6px 14px;
   border: none;
   border-radius: 4px;
-  background: #2563eb;
+  background: var(--accent);
   color: white;
   cursor: pointer;
   font-size: 13px;
 }
 
 .crjsx-prompt-popup .btn-confirm:hover {
-  background: #1d4ed8;
+  background: var(--accent-hover);
 }
 
 .crjsx-prompt-popup .btn-cancel {
   padding: 6px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-fine);
   border-radius: 4px;
-  background: white;
+  background: var(--paper);
   cursor: pointer;
   font-size: 13px;
-  color: #555;
+  color: var(--ink-soft);
 }
 
 .copy-markdown-btn {
@@ -111,15 +111,21 @@
   width: 100%;
   padding: 6px 10px;
   margin-bottom: 6px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-fine);
   border-radius: 6px;
-  background: #f9fafb;
+  background: var(--paper-warm);
   cursor: pointer;
   font-size: 13px;
-  color: #374151;
+  color: var(--ink-soft);
   text-align: center;
 }
 
 .copy-markdown-btn:hover {
-  background: #f3f4f6;
+  background: var(--paper-deep);
+}
+
+/* ─── Utility Classes ─── */
+.prompt-name {
+  font-weight: 600;
+  margin-bottom: 8px;
 }
