@@ -4,8 +4,8 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2147483647;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--paper);
+  border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 500px;
@@ -22,13 +22,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .crjsx-diff-header h3 {
   margin: 0;
   font-size: 16px;
-  color: #333;
+  color: var(--ink);
 }
 
 .crjsx-diff-close {
@@ -36,7 +36,7 @@
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: #666;
+  color: var(--ink-muted);
   padding: 4px;
 }
 
@@ -53,14 +53,14 @@
 .crjsx-diff-label {
   font-size: 12px;
   font-weight: 600;
-  color: #666;
+  color: var(--ink-muted);
   text-transform: uppercase;
   margin-bottom: 8px;
 }
 
 .crjsx-diff-text {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--paper-warm);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 12px;
   font-size: 14px;
@@ -72,13 +72,13 @@
 }
 
 .crjsx-diff-text.original {
-  background: #fef2f2;
-  border-color: #fecaca;
+  background: var(--rose-light);
+  border-color: var(--diff-removed-border);
 }
 
 .crjsx-diff-text.suggested {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
+  background: var(--sage-light);
+  border-color: var(--diff-added-border);
 }
 
 .crjsx-diff-changes {
@@ -92,25 +92,25 @@
 }
 
 .crjsx-diff-line.added {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--diff-added-line-bg);
+  color: var(--sage-dark);
 }
 
 .crjsx-diff-line.removed {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--rose-light);
+  color: var(--rose);
   text-decoration: line-through;
 }
 
 .crjsx-diff-line.unchanged {
-  color: #666;
+  color: var(--ink-muted);
 }
 
 .crjsx-diff-actions {
   display: flex;
   gap: 8px;
   padding: 16px 20px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
   justify-content: flex-end;
 }
 
@@ -124,30 +124,30 @@
 }
 
 .crjsx-diff-btn-apply {
-  background: #2563eb;
+  background: var(--accent);
   color: white;
 }
 
 .crjsx-diff-btn-apply:hover {
-  background: #1d4ed8;
+  background: var(--accent-hover);
 }
 
 .crjsx-diff-btn-copy {
-  background: #10b981;
+  background: var(--sage);
   color: white;
 }
 
 .crjsx-diff-btn-copy:hover {
-  background: #059669;
+  background: var(--sage-dark);
 }
 
 .crjsx-diff-btn-cancel {
-  background: #e5e7eb;
-  color: #333;
+  background: var(--border);
+  color: var(--ink);
 }
 
 .crjsx-diff-btn-cancel:hover {
-  background: #d1d5db;
+  background: var(--border-fine);
 }
 
 .crjsx-diff-backdrop {
@@ -158,4 +158,9 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 2147483646;
+}
+
+/* ─── Utility Classes ─── */
+.diff-btn-gap {
+  margin-bottom: 12px;
 }
