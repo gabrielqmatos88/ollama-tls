@@ -155,14 +155,7 @@ export default function ProvidersTab() {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
+      <div className="section-header">
         <h2>Providers</h2>
         <button className="btn btn-primary" onClick={startAdd}>
           Add Provider
@@ -170,19 +163,11 @@ export default function ProvidersTab() {
       </div>
 
       {editing && (
-        <div
-          style={{
-            background: "#f9fafb",
-            padding: 16,
-            borderRadius: 8,
-            marginBottom: 16,
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <h3 style={{ marginBottom: 12 }}>
+        <div className="form-card">
+          <h3>
             {editing === "new" ? "New Provider" : "Edit Provider"}
           </h3>
-          <div style={{ display: "grid", gap: 12 }}>
+          <div className="form-grid">
             <label>
               Name
               <input
@@ -213,7 +198,7 @@ export default function ProvidersTab() {
             </label>
             <label>
               Model
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <div className="model-row">
                 {modelList ? (
                   <select
                     value={form.model}
@@ -224,7 +209,7 @@ export default function ProvidersTab() {
                         setForm({ ...form, model: e.target.value });
                       }
                     }}
-                    style={{ flex: 1 }}
+                    className="flex-1"
                     disabled={!!form.builtIn}
                   >
                     <option value="__manual__">— enter manually —</option>
@@ -241,7 +226,7 @@ export default function ProvidersTab() {
                       setForm({ ...form, model: e.target.value })
                     }
                     placeholder="llama3.2"
-                    style={{ flex: 1 }}
+                    className="flex-1"
                     disabled={!!form.builtIn}
                   />
                 )}
@@ -249,13 +234,13 @@ export default function ProvidersTab() {
                   className="btn btn-secondary"
                   onClick={handleLoadModels}
                   disabled={modelLoading || !form.baseUrl || !!form.builtIn}
-                  style={{ whiteSpace: "nowrap" }}
+                  className="btn-nowrap"
                 >
                   {modelLoading ? "Loading..." : "Load Models"}
                 </button>
               </div>
               {modelError && (
-                <span style={{ fontSize: 13, color: "#dc2626" }}>
+                <span className="error-text">
                   {modelError}
                 </span>
               )}
@@ -270,13 +255,13 @@ export default function ProvidersTab() {
                 placeholder="-1"
                 disabled={!!form.builtIn}
               />
-              <div style={{ fontSize: 12, color: "#666", marginTop: 4 }}>
+              <div className="form-hint">
                 How long to keep model loaded. "-1" (permanent), "0" (unload
                 immediately), duration ("10m", "24h").
               </div>
             </label>
           </div>
-          <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+          <div className="form-actions">
             {!form.builtIn && (
               <button className="btn btn-primary" onClick={handleSave}>
                 Save
@@ -293,11 +278,7 @@ export default function ProvidersTab() {
             </button>
             {testResult && (
               <span
-                style={{
-                  alignSelf: "center",
-                  fontSize: 14,
-                  color: testResult.includes("Error") ? "#dc2626" : "#16a34a",
-                }}
+                className={`test-result ${testResult.includes("Error") ? "test-result--error" : "test-result--success"}`}
               >
                 {testResult}
               </span>
@@ -306,19 +287,9 @@ export default function ProvidersTab() {
         </div>
       )}
 
-      <div style={{ display: "grid", gap: 8 }}>
+      <div className="items-list">
         {providers.map((provider) => (
-          <div
-            key={provider.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: 12,
-              border: "1px solid #e5e7eb",
-              borderRadius: 8,
-              gap: 12,
-            }}
-          >
+          <div key={provider.id} className="item-card">
             <input
               type="radio"
               name="defaultProvider"
@@ -326,39 +297,21 @@ export default function ProvidersTab() {
                 settings ? provider.id === settings.defaultProviderId : false
               }
               onChange={() => handleSetDefault(provider.id)}
-              style={{ width: "auto" }}
+              className="input-auto"
             />
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <strong>{provider.name}</strong>
               {provider.builtIn && (
-                <span
-                  style={{
-                    marginLeft: 8,
-                    fontSize: 12,
-                    color: "#65a30d",
-                    background: "#f0fdf4",
-                    padding: "2px 6px",
-                    borderRadius: 4,
-                  }}
-                >
+                <span className="badge badge--green">
                   built-in
                 </span>
               )}
               {settings && provider.id === settings.defaultProviderId && (
-                <span
-                  style={{
-                    marginLeft: 8,
-                    fontSize: 12,
-                    color: "#2563eb",
-                    background: "#eff6ff",
-                    padding: "2px 6px",
-                    borderRadius: 4,
-                  }}
-                >
+                <span className="badge badge--blue">
                   default
                 </span>
               )}
-              <div style={{ fontSize: 13, color: "#666" }}>
+              <div className="form-hint">
                 {provider.baseUrl} — {provider.model || "(no model selected)"}
               </div>
             </div>
@@ -385,7 +338,7 @@ export default function ProvidersTab() {
           </div>
         ))}
         {providers.length === 0 && !editing && (
-          <p style={{ color: "#666", textAlign: "center", padding: 24 }}>
+          <p className="empty-text">
             No providers configured. Click "Add Provider" to get started.
           </p>
         )}

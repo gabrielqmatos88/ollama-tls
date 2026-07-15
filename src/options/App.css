@@ -222,6 +222,10 @@ select:focus {
   color: var(--sage);
 }
 
+.input-auto {
+  width: auto;
+}
+
 .hr-divider {
   border: none;
   border-top: 1px solid var(--border);
