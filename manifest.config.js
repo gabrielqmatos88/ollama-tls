@@ -1,46 +1,44 @@
-import { defineManifest } from '@crxjs/vite-plugin'
-import pkg from './package.json'
+import { defineManifest } from "@crxjs/vite-plugin";
+import pkg from "./package.json";
 
 export default defineManifest({
   manifest_version: 3,
   name: pkg.name,
   version: pkg.version,
   icons: {
-    48: 'public/logo.png',
+    48: "public/logo.png",
   },
   permissions: [
-    'sidePanel',
-    'contentSettings',
-    'contextMenus',
-    'storage',
-    'clipboardWrite',
-    'scripting',
+    "sidePanel",
+    "contentSettings",
+    "contextMenus",
+    "storage",
+    "clipboardWrite",
+    "scripting",
   ],
   background: {
-    service_worker: 'src/background/main.js',
-    type: 'module',
+    service_worker: "src/background/main.js",
+    type: "module",
   },
-  host_permissions: [
-    '<all_urls>',
-  ],
+  host_permissions: ["<all_urls>"],
   action: {
     default_icon: {
-      48: 'public/logo.png',
+      48: "public/logo.png",
     },
   },
   content_scripts: [
     {
-      js: ['src/content/main.jsx'],
-      matches: ['https://*/*'],
+      js: ["src/content/main.jsx"],
+      matches: ["https://*/*"],
     },
     {
-      js: ['src/content/textareaCompose.jsx'],
-      matches: ['https://*/*'],
-      run_at: 'document_idle',
-    }
+      js: ["src/content/textareaCompose.jsx"],
+      matches: ["https://*/*"],
+      run_at: "document_idle",
+    },
   ],
   side_panel: {
-    default_path: 'src/sidepanel/index.html',
+    default_path: "src/sidepanel/index.html",
   },
-  options_page: 'src/options/index.html',
-})
+  options_page: "src/options/index.html",
+});

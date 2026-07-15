@@ -1,25 +1,25 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from "react";
 
 export default function ChatInput({ onSend, disabled }) {
-  const [text, setText] = useState('')
-  const textareaRef = useRef(null)
+  const [text, setText] = useState("");
+  const textareaRef = useRef(null);
 
   useEffect(() => {
-    textareaRef.current?.focus()
-  }, [])
+    textareaRef.current?.focus();
+  }, []);
 
   function handleKeyDown(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   }
 
   function handleSend() {
-    const trimmed = text.trim()
-    if (!trimmed || disabled) return
-    onSend(trimmed)
-    setText('')
+    const trimmed = text.trim();
+    if (!trimmed || disabled) return;
+    onSend(trimmed);
+    setText("");
   }
 
   return (
@@ -27,7 +27,7 @@ export default function ChatInput({ onSend, disabled }) {
       <textarea
         ref={textareaRef}
         value={text}
-        onChange={e => setText(e.target.value)}
+        onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type a message... (Enter to send, Shift+Enter for newline)"
         disabled={disabled}
@@ -37,5 +37,5 @@ export default function ChatInput({ onSend, disabled }) {
         Send
       </button>
     </div>
-  )
+  );
 }

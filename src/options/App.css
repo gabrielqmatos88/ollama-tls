@@ -5,7 +5,8 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--paper-warm);
   color: var(--ink);
   padding: 24px;
@@ -90,7 +91,9 @@ h1 {
   background: var(--border);
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -100,7 +103,9 @@ input, textarea, select {
   color: var(--ink);
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
