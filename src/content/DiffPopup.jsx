@@ -60,9 +60,8 @@ export default function DiffPopup({
           </div>
 
           <button
-            className="crjsx-diff-btn crjsx-diff-btn-cancel"
+            className="crjsx-diff-btn crjsx-diff-btn-cancel diff-btn-gap"
             onClick={() => setShowDiff(!showDiff)}
-            style={{ marginBottom: 12 }}
           >
             {showDiff ? "Hide" : "Show"} Diff
           </button>

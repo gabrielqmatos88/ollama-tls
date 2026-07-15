@@ -103,7 +103,7 @@ export default function PromptPopup({
         </div>
       ) : (
         <div>
-          <div style={{ fontWeight: 600, marginBottom: 8 }}>
+          <div className="prompt-name">
             {selectedPrompt.name}
           </div>
           <div className="variables-form">
@@ -157,7 +157,7 @@ export default function PromptPopup({
                           [variable.name]: e.target.checked,
                         })
                       }
-                      style={{ width: "auto" }}
+                      className="input-auto"
                     />
                     <span>{variable.name}</span>
                   </div>
@@ -195,7 +195,7 @@ export default function PromptPopup({
                               [variable.name]: e.target.value,
                             })
                           }
-                          style={{ width: "auto" }}
+                          className="input-auto"
                         />
                         {opt}
                       </label>
