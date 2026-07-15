@@ -47,7 +47,7 @@ export default function SettingsTab() {
     <div>
       <h2 style={{ marginBottom: 16 }}>Settings</h2>
 
-      <div style={{ display: "grid", gap: 16, maxWidth: 400 }}>
+      <div className="form-grid" style={{ maxWidth: 400 }}>
         <label>
           Theme
           <select
@@ -69,7 +69,7 @@ export default function SettingsTab() {
             }
             placeholder={browserLang}
           />
-          <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>
+          <div className="form-hint">
             Used for "Translate to Native" prompt. Browser default:{" "}
             {browserLang}
           </div>
@@ -80,19 +80,19 @@ export default function SettingsTab() {
             Save Settings
           </button>
           {saved && (
-            <span style={{ marginLeft: 8, color: "#65a30d", fontSize: 14 }}>
+            <span className="test-result test-result--success" style={{ marginLeft: 8 }}>
               Saved!
             </span>
           )}
         </div>
 
-        <hr style={{ border: "none", borderTop: "1px solid #e5e7eb" }} />
+        <hr className="hr-divider" />
 
         <div>
           <button className="btn btn-danger" onClick={handleClearHistory}>
             Clear All Conversation History
           </button>
-          <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>
+          <div className="form-hint">
             This will delete all saved conversations from the side panel.
           </div>
         </div>
