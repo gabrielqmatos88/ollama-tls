@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getProviders, addProvider, updateProvider, deleteProvider } from '@/storage/providers'
+import { getSettings, setDefaultProviderId } from '@/storage/settings'
 
 const EMPTY_PROVIDER = {
   name: '',
@@ -7,7 +8,6 @@ const EMPTY_PROVIDER = {
   apiKey: '',
   model: '',
   keepAlive: '-1',
-  isDefault: false,
 }
 
 export default function ProvidersTab() {
@@ -18,9 +18,21 @@ export default function ProvidersTab() {
   const [modelList, setModelList] = useState(null)
   const [modelLoading, setModelLoading] = useState(false)
   const [modelError, setModelError] = useState(null)
+  const [settings, setSettingsState] = useState(null)
 
   useEffect(() => {
     loadProviders()
+    getSettings().then(setSettingsState)
+  }, [])
+
+  useEffect(() => {
+    const listener = (changes, area) => {
+      if (area === 'sync' && changes.settings) {
+        getSettings().then(setSettingsState)
+      }
+    }
+    chrome.storage.onChanged.addListener(listener)
+    return () => chrome.storage.onChanged.removeListener(listener)
   }, [])
 
   async function loadProviders() {
@@ -52,7 +64,7 @@ export default function ProvidersTab() {
     while (existingNames.has(name)) {
       name = `${baseName} (copy ${i++})`
     }
-    setForm({ ...provider, id: undefined, name, model: '', isDefault: false, builtIn: false })
+    setForm({ ...provider, id: undefined, name, model: '', builtIn: false })
     setEditing('new')
     setTestResult(null)
     setModelList(null)
@@ -88,11 +100,7 @@ export default function ProvidersTab() {
   }
 
   async function handleSetDefault(id) {
-    // Clear all defaults first
-    for (const p of providers) {
-      if (p.isDefault) await updateProvider(p.id, { isDefault: false })
-    }
-    await updateProvider(id, { isDefault: true })
+    await setDefaultProviderId(id)
     await loadProviders()
   }
 
@@ -152,6 +160,7 @@ export default function ProvidersTab() {
                 value={form.name}
                 onChange={e => setForm({ ...form, name: e.target.value })}
                 placeholder="My Provider"
+                disabled={!!form.builtIn}
               />
             </label>
             <label>
@@ -160,6 +169,7 @@ export default function ProvidersTab() {
                 value={form.baseUrl}
                 onChange={e => setForm({ ...form, baseUrl: e.target.value })}
                 placeholder="http://localhost:11434/v1"
+                disabled={!!form.builtIn}
               />
             </label>
             <label>
@@ -169,6 +179,7 @@ export default function ProvidersTab() {
                 value={form.apiKey}
                 onChange={e => setForm({ ...form, apiKey: e.target.value })}
                 placeholder="sk-..."
+                disabled={!!form.builtIn}
               />
             </label>
             <label>
@@ -185,6 +196,7 @@ export default function ProvidersTab() {
                       }
                     }}
                     style={{ flex: 1 }}
+                    disabled={!!form.builtIn}
                   >
                     <option value="__manual__">— enter manually —</option>
                     {modelList.map(m => (
@@ -197,12 +209,13 @@ export default function ProvidersTab() {
                     onChange={e => setForm({ ...form, model: e.target.value })}
                     placeholder="llama3.2"
                     style={{ flex: 1 }}
+                    disabled={!!form.builtIn}
                   />
                 )}
                 <button
                   className="btn btn-secondary"
                   onClick={handleLoadModels}
-                  disabled={modelLoading || !form.baseUrl}
+                  disabled={modelLoading || !form.baseUrl || !!form.builtIn}
                   style={{ whiteSpace: 'nowrap' }}
                 >
                   {modelLoading ? 'Loading...' : 'Load Models'}
@@ -216,23 +229,15 @@ export default function ProvidersTab() {
                 value={form.keepAlive || '-1'}
                 onChange={e => setForm({ ...form, keepAlive: e.target.value })}
                 placeholder="-1"
+                disabled={!!form.builtIn}
               />
               <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>
                 How long to keep model loaded. "-1" (permanent), "0" (unload immediately), duration ("10m", "24h").
               </div>
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input
-                type="checkbox"
-                checked={form.isDefault}
-                onChange={e => setForm({ ...form, isDefault: e.target.checked })}
-                style={{ width: 'auto' }}
-              />
-              Set as default provider
-            </label>
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-            <button className="btn btn-primary" onClick={handleSave}>Save</button>
+            {!form.builtIn && <button className="btn btn-primary" onClick={handleSave}>Save</button>}
             <button className="btn btn-secondary" onClick={handleTestConnection}>Test Connection</button>
             <button className="btn btn-secondary" onClick={cancelEdit}>Cancel</button>
             {testResult && <span style={{ alignSelf: 'center', fontSize: 14, color: testResult.includes('Error') ? '#dc2626' : '#16a34a' }}>{testResult}</span>}
@@ -246,13 +251,13 @@ export default function ProvidersTab() {
             <input
               type="radio"
               name="defaultProvider"
-              checked={provider.isDefault}
+              checked={settings ? provider.id === settings.defaultProviderId : false}
               onChange={() => handleSetDefault(provider.id)}
               style={{ width: 'auto' }}
             />
             <div style={{ flex: 1 }}>
               <strong>{provider.name}</strong>
-              {provider.isDefault && <span style={{ marginLeft: 8, fontSize: 12, color: '#2563eb', background: '#eff6ff', padding: '2px 6px', borderRadius: 4 }}>default</span>}
+              {settings && provider.id === settings.defaultProviderId && <span style={{ marginLeft: 8, fontSize: 12, color: '#2563eb', background: '#eff6ff', padding: '2px 6px', borderRadius: 4 }}>default</span>}
               {provider.builtIn && <span style={{ marginLeft: 8, fontSize: 12, color: '#65a30d', background: '#f0fdf4', padding: '2px 6px', borderRadius: 4 }}>built-in</span>}
               <div style={{ fontSize: 13, color: '#666' }}>{provider.baseUrl} — {provider.model || '(no model selected)'}</div>
             </div>

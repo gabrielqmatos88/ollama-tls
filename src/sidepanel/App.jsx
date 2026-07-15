@@ -4,6 +4,7 @@ import ChatInput from './ChatInput.jsx'
 import PromptBar from './PromptBar.jsx'
 import { getPrompts } from '@/storage/prompts'
 import { getDefaultProvider, getProviders } from '@/storage/providers'
+import { getSettings } from '@/storage/settings'
 import { replaceVariables } from '@/utils/templateParser'
 import { callProvider } from '@/api/client.js'
 import { onMessage, checkPending } from '@/utils/messageBus'
@@ -44,8 +45,10 @@ export default function App() {
     loadConversation().then(setConversation)
     getProviders().then(allProviders => {
       setProviders(allProviders)
-      const defaultProv = allProviders.find(p => p.isDefault) || allProviders[0]
-      if (defaultProv) setActiveProviderId(defaultProv.id)
+      getSettings().then(s => {
+        const defaultProv = allProviders.find(p => p.id === s.defaultProviderId) || allProviders[0]
+        if (defaultProv) setActiveProviderId(defaultProv.id)
+      })
     })
 
     // Subscribe to MessageBus
@@ -67,8 +70,13 @@ export default function App() {
         getProviders().then(allProviders => {
           setProviders(allProviders)
           setActiveProviderId(prev =>
-            allProviders.some(p => p.id === prev) ? prev : (allProviders.find(p => p.isDefault) || allProviders[0])?.id
+            allProviders.some(p => p.id === prev) ? prev : (allProviders[0]?.id || null)
           )
+        })
+      }
+      if (area === 'sync' && changes.settings) {
+        getSettings().then(s => {
+          setActiveProviderId(s.defaultProviderId)
         })
       }
     }

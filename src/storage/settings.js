@@ -4,7 +4,7 @@ export async function getSettings() {
   const result = await chrome.storage.sync.get(STORAGE_KEY)
   return result[STORAGE_KEY] || {
     nativeLanguage: null,
-    defaultProviderId: null,
+    defaultProviderId: 'ollama-local',
     theme: 'light',
   }
 }
@@ -18,4 +18,10 @@ export async function updateSettings(updates) {
   const updated = { ...settings, ...updates }
   await saveSettings(updated)
   return updated
+}
+
+export async function setDefaultProviderId(id) {
+  const settings = await getSettings()
+  settings.defaultProviderId = id
+  await saveSettings(settings)
 }

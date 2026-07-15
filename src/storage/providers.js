@@ -1,3 +1,5 @@
+import { getSettings } from './settings'
+
 const STORAGE_KEY = 'providers'
 
 const BUILT_IN_PROVIDERS = [
@@ -8,7 +10,6 @@ const BUILT_IN_PROVIDERS = [
     apiKey: '',
     model: 'llama3.2',
     keepAlive: '-1',
-    isDefault: true,
     builtIn: true,
   },
 ]
@@ -29,9 +30,6 @@ export async function saveProviders(providers) {
 export async function addProvider(provider) {
   const providers = await getProviders()
   provider.id = crypto.randomUUID()
-  if (provider.isDefault) {
-    providers.forEach(p => { p.isDefault = false })
-  }
   providers.push(provider)
   await saveProviders(providers)
   return provider
@@ -54,6 +52,7 @@ export async function deleteProvider(id) {
 }
 
 export async function getDefaultProvider() {
-  const providers = await getProviders()
-  return providers.find(p => p.isDefault) || providers[0] || null
+  const [providers, settings] = await Promise.all([getProviders(), getSettings()])
+  const defaultProv = providers.find(p => p.id === settings.defaultProviderId)
+  return defaultProv || providers[0] || null
 }
