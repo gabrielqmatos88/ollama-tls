@@ -268,7 +268,7 @@ export default function NotesTab() {
                 type="checkbox"
                 checked={selectedIds.has(note.id)}
                 onChange={() => toggleSelect(note.id)}
-                style={{ width: "auto" }}
+                className="input-auto"
               />
               <div
                 className="note-content"

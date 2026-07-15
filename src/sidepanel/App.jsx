@@ -273,7 +273,7 @@ export default function App() {
             Notes
           </button>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="header-actions">
           {activeTab === "chat" && isStreaming && (
             <button className="stop-btn" onClick={handleStop}>
               Stop
@@ -281,17 +281,15 @@ export default function App() {
           )}
           {activeTab === "chat" && (
             <button
-              className="btn btn-secondary"
+              className="btn btn-secondary header-btn"
               onClick={handleNewConversation}
-              style={{ padding: "4px 12px", fontSize: 13 }}
             >
               New
             </button>
           )}
           <button
-            className="btn btn-secondary"
+            className="btn btn-secondary header-btn"
             onClick={() => chrome.runtime.openOptionsPage()}
-            style={{ padding: "4px 12px", fontSize: 13 }}
           >
             ⚙️
           </button>
@@ -315,13 +313,7 @@ export default function App() {
             {isStreaming && streamingContent && (
               <div className="chat-message assistant">
                 <div className="message-content">
-                  <pre
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      fontFamily: "inherit",
-                      margin: 0,
-                    }}
-                  >
+                  <pre className="message-pre">
                     {streamingContent}
                   </pre>
                 </div>

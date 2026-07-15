@@ -153,7 +153,7 @@ export default function PromptBar({
                       })
                     }
                     disabled={disabled}
-                    style={{ width: "auto" }}
+                    className="input-auto"
                   />
                   <span>{variable.name}</span>
                 </div>
@@ -193,7 +193,7 @@ export default function PromptBar({
                           })
                         }
                         disabled={disabled}
-                        style={{ width: "auto" }}
+                        className="input-auto"
                       />
                       {opt}
                     </label>

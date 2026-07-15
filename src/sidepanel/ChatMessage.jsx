@@ -4,9 +4,7 @@ export default function ChatMessage({ message, onCopy }) {
   return (
     <div className={`chat-message ${isUser ? "user" : "assistant"}`}>
       <div className="message-content">
-        <pre
-          style={{ whiteSpace: "pre-wrap", fontFamily: "inherit", margin: 0 }}
-        >
+        <pre className="message-pre">
           {message.content}
         </pre>
       </div>
