@@ -508,6 +508,33 @@ body {
   border-top: 1px solid var(--border);
 }
 
+/* ─── Buttons ─── */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--paper-deep);
+  color: var(--ink);
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
 /* ─── Utility Classes ─── */
 .header-actions {
   display: flex;
