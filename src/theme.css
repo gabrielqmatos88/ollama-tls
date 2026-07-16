@@ -35,7 +35,7 @@
   --paper: #1e1e1e;
   --paper-warm: #252526;
   --paper-deep: #2d2d30;
-  --accent: #4fc1ff;
+  --accent: #3493c7;
   --accent-hover: #2ba4e0;
   --accent-light: #1e3a4d;
   --accent-soft: #1e3a4d;
@@ -49,7 +49,7 @@
   --sage-light: #1a3a1a;
   --sage-dark: #4ec9b0;
   --rose-dark: #b91c1c;
-  --accent-ring: rgba(79, 193, 255, 0.2);
+  --accent-ring: rgba(52, 147, 199, 0.2);
   --diff-added-border: #2d5a3e;
   --diff-removed-border: #5a2d2d;
   --diff-added-line-bg: #1a3a1a;
