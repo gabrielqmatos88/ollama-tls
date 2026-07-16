@@ -3,6 +3,7 @@ import ProvidersTab from "./ProvidersTab.jsx";
 import PromptsTab from "./PromptsTab.jsx";
 import SettingsTab from "./SettingsTab.jsx";
 import OllamaInstancesTab from "./OllamaInstancesTab.jsx";
+import OnlineBackupTab from "./OnlineBackupTab.jsx";
 import { getDefaultProvider } from "@/storage/providers";
 
 function isLocalhostProvider(provider) {
@@ -30,6 +31,7 @@ export default function App() {
     { id: "providers", label: "Providers" },
     { id: "prompts", label: "Prompts" },
     { id: "settings", label: "Settings" },
+    { id: "backup", label: "Online Backup" },
     ...(showOllamaTab ? [{ id: "ollama", label: "Ollama" }] : []),
   ];
 
@@ -51,6 +53,7 @@ export default function App() {
         {activeTab === "providers" && <ProvidersTab />}
         {activeTab === "prompts" && <PromptsTab />}
         {activeTab === "settings" && <SettingsTab />}
+        {activeTab === "backup" && <OnlineBackupTab />}
         {activeTab === "ollama" && <OllamaInstancesTab />}
       </main>
     </div>
