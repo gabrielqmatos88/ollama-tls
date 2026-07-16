@@ -511,14 +511,21 @@ body {
 /* ─── Buttons ─── */
 .btn {
   padding: 8px 16px;
-  border: none;
+  border: 1px solid var(--border);
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  background: var(--paper-deep);
+  color: var(--ink);
+}
+
+.btn:hover {
+  background: var(--border);
 }
 
 .btn-primary {
   background: var(--accent);
+  border-color: var(--accent-hover);
   color: white;
 }
 
@@ -528,6 +535,7 @@ body {
 
 .btn-secondary {
   background: var(--paper-deep);
+  border-color: var(--border);
   color: var(--ink);
 }
 
