@@ -8,8 +8,8 @@ import {
 } from "@/utils/gistApi";
 import { getSettings, saveSettings } from "@/storage/settings";
 import { getProviders, saveProviders } from "@/storage/providers";
-import { getPrompts, savePrompts, initializePrompts } from "@/storage/prompts";
-import { getNotes } from "@/storage/notes";
+import { getPrompts, savePrompts } from "@/storage/prompts";
+import { getNotes, saveNotes } from "@/storage/notes";
 
 const GIST_CONFIG_KEY = "gistConfig";
 
@@ -107,6 +107,11 @@ export default function OnlineBackupTab() {
       const data = JSON.parse(scribeFile.content);
       validateImportData(data);
 
+      const confirmed = window.confirm(
+        "This will replace ALL your settings, providers, prompts, and notes. Continue?"
+      );
+      if (!confirmed) return;
+
       await saveSettings({
         nativeLanguage: data.settings.nativeLanguage ?? null,
         defaultProviderId: data.settings.defaultProviderId ?? "ollama-local",
@@ -114,8 +119,7 @@ export default function OnlineBackupTab() {
       });
       await saveProviders(data.providers);
       await savePrompts(data.prompts);
-      await chrome.storage.local.set({ notes: data.notes || [] });
-      await initializePrompts();
+      await saveNotes(data.notes || []);
 
       setImportSuccess("Data imported successfully. Reloading...");
       setTimeout(() => window.location.reload(), 1500);

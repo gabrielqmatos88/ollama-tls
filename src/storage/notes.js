@@ -20,6 +20,10 @@ export async function addNote({ text, sourceUrl, sourceTitle }) {
   return note;
 }
 
+export async function saveNotes(notes) {
+  await chrome.storage.local.set({ [STORAGE_KEY]: notes });
+}
+
 export async function deleteNote(id) {
   const notes = await getNotes();
   await chrome.storage.local.set({

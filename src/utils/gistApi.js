@@ -7,13 +7,14 @@ export function parseGistUrl(url) {
 
 export async function fetchGist(gistId) {
   const res = await fetch(`${GIST_API}/${gistId}`);
-  if (!res.ok) throw new Error(`Gist not found (${res.status})`);
+  if (!res.ok) throw new Error(`Gist not found (${res.status}). Note: only public gists can be imported.`);
   return res.json();
 }
 
 export async function findScribeGist(token) {
   let page = 1;
-  while (true) {
+  const maxPages = 10;
+  while (page <= maxPages) {
     const res = await fetch(`${GIST_API}?per_page=100&page=${page}`, {
       headers: { Authorization: `token ${token}` },
     });
@@ -24,6 +25,7 @@ export async function findScribeGist(token) {
     if (found) return found;
     page++;
   }
+  return null;
 }
 
 export async function createScribeGist(token, data, isPublic) {
