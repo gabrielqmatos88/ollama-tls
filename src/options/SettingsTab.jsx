@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getSettings, updateSettings } from "@/storage/settings";
+import { initializePrompts } from "@/storage/prompts";
 import { applyTheme } from "@/utils/theme";
 
 export default function SettingsTab() {
@@ -39,6 +40,17 @@ export default function SettingsTab() {
   async function handleClearHistory() {
     await chrome.storage.local.remove("conversations");
     alert("Conversation history cleared.");
+  }
+
+  async function handleResetData() {
+    const confirmed = window.confirm(
+      "This will reset ALL settings, prompts, providers, and conversation history to defaults. This cannot be undone. Continue?"
+    );
+    if (!confirmed) return;
+    await chrome.storage.sync.clear();
+    await chrome.storage.local.clear();
+    await initializePrompts();
+    window.location.reload();
   }
 
   const browserLang = navigator.language || "";
@@ -94,6 +106,17 @@ export default function SettingsTab() {
           </button>
           <div className="form-hint">
             This will delete all saved conversations from the side panel.
+          </div>
+        </div>
+
+        <hr className="hr-divider" />
+
+        <div>
+          <button className="btn btn-danger" onClick={handleResetData}>
+            Reset Data
+          </button>
+          <div className="form-hint">
+            This will reset all settings, prompts, and providers to defaults and clear all data.
           </div>
         </div>
       </div>
